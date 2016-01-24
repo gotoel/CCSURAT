@@ -1,6 +1,6 @@
-﻿namespace CCSURAT_Client
+﻿namespace CCSURAT_Server
 {
-    partial class Form1
+    partial class ServerMainForm
     {
         /// <summary>
         /// Required designer variable.
@@ -28,10 +28,28 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.console = new System.Windows.Forms.RichTextBox();
-            this.cmdTextbox = new System.Windows.Forms.TextBox();
             this.sendButton = new System.Windows.Forms.Button();
+            this.cmdTextbox = new System.Windows.Forms.TextBox();
+            this.console = new System.Windows.Forms.RichTextBox();
             this.SuspendLayout();
+            // 
+            // sendButton
+            // 
+            this.sendButton.FlatAppearance.BorderColor = System.Drawing.Color.White;
+            this.sendButton.Location = new System.Drawing.Point(459, 229);
+            this.sendButton.Name = "sendButton";
+            this.sendButton.Size = new System.Drawing.Size(75, 21);
+            this.sendButton.TabIndex = 5;
+            this.sendButton.Text = "Send";
+            this.sendButton.UseVisualStyleBackColor = true;
+            this.sendButton.Click += new System.EventHandler(this.sendButton_Click);
+            // 
+            // cmdTextbox
+            // 
+            this.cmdTextbox.Location = new System.Drawing.Point(3, 229);
+            this.cmdTextbox.Name = "cmdTextbox";
+            this.cmdTextbox.Size = new System.Drawing.Size(453, 20);
+            this.cmdTextbox.TabIndex = 4;
             // 
             // console
             // 
@@ -40,29 +58,14 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.console.BackColor = System.Drawing.Color.Black;
             this.console.ForeColor = System.Drawing.Color.Lime;
-            this.console.Location = new System.Drawing.Point(-1, 0);
+            this.console.Location = new System.Drawing.Point(0, -1);
             this.console.Name = "console";
+            this.console.ReadOnly = true;
             this.console.Size = new System.Drawing.Size(537, 229);
-            this.console.TabIndex = 0;
+            this.console.TabIndex = 3;
             this.console.Text = "";
             // 
-            // cmdTextbox
-            // 
-            this.cmdTextbox.Location = new System.Drawing.Point(7, 230);
-            this.cmdTextbox.Name = "cmdTextbox";
-            this.cmdTextbox.Size = new System.Drawing.Size(448, 20);
-            this.cmdTextbox.TabIndex = 1;
-            // 
-            // sendButton
-            // 
-            this.sendButton.Location = new System.Drawing.Point(458, 230);
-            this.sendButton.Name = "sendButton";
-            this.sendButton.Size = new System.Drawing.Size(75, 21);
-            this.sendButton.TabIndex = 2;
-            this.sendButton.Text = "Send";
-            this.sendButton.UseVisualStyleBackColor = true;
-            // 
-            // Form1
+            // ServerMainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -70,8 +73,8 @@
             this.Controls.Add(this.sendButton);
             this.Controls.Add(this.cmdTextbox);
             this.Controls.Add(this.console);
-            this.Name = "Form1";
-            this.Text = "Form1";
+            this.Name = "ServerMainForm";
+            this.Text = "CCSURAT-Server";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -80,9 +83,9 @@
 
         #endregion
 
-        private System.Windows.Forms.RichTextBox console;
-        private System.Windows.Forms.TextBox cmdTextbox;
         private System.Windows.Forms.Button sendButton;
+        private System.Windows.Forms.TextBox cmdTextbox;
+        private System.Windows.Forms.RichTextBox console;
     }
 }
 
