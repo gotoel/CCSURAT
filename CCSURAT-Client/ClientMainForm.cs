@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace CCSURAT_Client
@@ -6,7 +7,7 @@ namespace CCSURAT_Client
     public partial class ClientMainForm : Form
     {
         // Declare server details.
-        private static string serverIP = "127.0.0.1";
+        private static string serverIP = "192.168.2.144";
         private static int serverPort = 7777;
 
         private NetworkManager connection;
@@ -19,6 +20,8 @@ namespace CCSURAT_Client
         private void Form1_Load(object sender, EventArgs e)
         {
             connection = new NetworkManager(this, serverIP, serverPort);
+            Thread networkThread = new Thread(new ThreadStart(connection.Start));
+            networkThread.Start();
         }
 
         private void sendButton_Click(object sender, EventArgs e)
@@ -36,6 +39,11 @@ namespace CCSURAT_Client
             }
             console.AppendText("[ " + string.Format("{0:hh:mm:ss tt}", DateTime.Now) + " ] " + s + "\n");
             console.ScrollToCaret();
+        }
+
+        private void ClientMainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Application.Exit();
         }
     }
 }

