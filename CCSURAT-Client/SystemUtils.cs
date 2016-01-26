@@ -15,14 +15,13 @@ namespace CCSURAT_Client
     static class SystemUtils
     {
         public static string SystemInfo()
-        {
+        { 
             string info = "";
             info += Application.ProductVersion + "|*|";
             info += Environment.MachineName + "|*|";
             info += Environment.UserName + "|*|";
             info += GetOS() + "|*|";
             info += GetCPU();
-    
             return info;
         }
 

