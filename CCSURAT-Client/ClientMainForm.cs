@@ -7,7 +7,7 @@ namespace CCSURAT_Client
     public partial class ClientMainForm : Form
     {
         // Declare server details.
-        private static string serverIP = "192.168.2.144";
+        private static string serverIP = "127.0.0.1";
         private static int serverPort = 7777;
 
         private NetworkManager connection;
@@ -41,7 +41,7 @@ namespace CCSURAT_Client
             console.ScrollToCaret();
         }
 
-        private void ClientMainForm_FormClosing(object sender, FormClosingEventArgs e)
+        private void ClientMainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             Application.Exit();
         }

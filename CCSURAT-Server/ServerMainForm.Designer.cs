@@ -28,14 +28,20 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.sendButton = new System.Windows.Forms.Button();
             this.cmdTextbox = new System.Windows.Forms.TextBox();
             this.console = new System.Windows.Forms.RichTextBox();
             this.zombieListView = new System.Windows.Forms.ListView();
-            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.IP = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.computerName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.username = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.OS = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.clientControl = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.restartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.killToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.Version = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.clientControl.SuspendLayout();
             this.SuspendLayout();
             // 
             // sendButton
@@ -72,10 +78,11 @@
             // zombieListView
             // 
             this.zombieListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1,
-            this.columnHeader2,
-            this.columnHeader3,
-            this.columnHeader4});
+            this.IP,
+            this.Version,
+            this.computerName,
+            this.username,
+            this.OS});
             this.zombieListView.FullRowSelect = true;
             this.zombieListView.GridLines = true;
             this.zombieListView.Location = new System.Drawing.Point(2, 4);
@@ -84,26 +91,53 @@
             this.zombieListView.TabIndex = 6;
             this.zombieListView.UseCompatibleStateImageBehavior = false;
             this.zombieListView.View = System.Windows.Forms.View.Details;
+            this.zombieListView.MouseDown += new System.Windows.Forms.MouseEventHandler(this.zombieListView_MouseDown);
             // 
-            // columnHeader1
+            // IP
             // 
-            this.columnHeader1.Text = "IP";
-            this.columnHeader1.Width = 150;
+            this.IP.Text = "IP";
+            this.IP.Width = 150;
             // 
-            // columnHeader2
+            // computerName
             // 
-            this.columnHeader2.Text = "Computer Name";
-            this.columnHeader2.Width = 150;
+            this.computerName.Text = "Computer Name";
+            this.computerName.Width = 150;
             // 
-            // columnHeader3
+            // username
             // 
-            this.columnHeader3.Text = "Username";
-            this.columnHeader3.Width = 150;
+            this.username.Text = "Username";
+            this.username.Width = 150;
             // 
-            // columnHeader4
+            // OS
             // 
-            this.columnHeader4.Text = "OS";
-            this.columnHeader4.Width = 150;
+            this.OS.Text = "OS";
+            this.OS.Width = 150;
+            // 
+            // clientControl
+            // 
+            this.clientControl.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.restartToolStripMenuItem,
+            this.killToolStripMenuItem});
+            this.clientControl.Name = "clientControl";
+            this.clientControl.Size = new System.Drawing.Size(111, 48);
+            // 
+            // restartToolStripMenuItem
+            // 
+            this.restartToolStripMenuItem.Name = "restartToolStripMenuItem";
+            this.restartToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.restartToolStripMenuItem.Text = "Restart";
+            this.restartToolStripMenuItem.Click += new System.EventHandler(this.restartToolStripMenuItem_Click);
+            // 
+            // killToolStripMenuItem
+            // 
+            this.killToolStripMenuItem.Name = "killToolStripMenuItem";
+            this.killToolStripMenuItem.Size = new System.Drawing.Size(110, 22);
+            this.killToolStripMenuItem.Text = "Kill";
+            this.killToolStripMenuItem.Click += new System.EventHandler(this.killToolStripMenuItem_Click);
+            // 
+            // Version
+            // 
+            this.Version.Text = "Version";
             // 
             // ServerMainForm
             // 
@@ -117,6 +151,7 @@
             this.Name = "ServerMainForm";
             this.Text = "CCSURAT-Server";
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.clientControl.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -127,11 +162,15 @@
         private System.Windows.Forms.Button sendButton;
         private System.Windows.Forms.TextBox cmdTextbox;
         private System.Windows.Forms.RichTextBox console;
-        private System.Windows.Forms.ColumnHeader columnHeader1;
-        private System.Windows.Forms.ColumnHeader columnHeader2;
-        private System.Windows.Forms.ColumnHeader columnHeader3;
+        private System.Windows.Forms.ColumnHeader IP;
+        private System.Windows.Forms.ColumnHeader computerName;
+        private System.Windows.Forms.ColumnHeader username;
         public System.Windows.Forms.ListView zombieListView;
-        private System.Windows.Forms.ColumnHeader columnHeader4;
+        private System.Windows.Forms.ColumnHeader OS;
+        private System.Windows.Forms.ContextMenuStrip clientControl;
+        private System.Windows.Forms.ToolStripMenuItem killToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem restartToolStripMenuItem;
+        private System.Windows.Forms.ColumnHeader Version;
     }
 }
 

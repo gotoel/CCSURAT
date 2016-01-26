@@ -74,7 +74,7 @@
             this.Controls.Add(this.console);
             this.Name = "ClientMainForm";
             this.Text = "CCSURAT-Client";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ClientMainForm_FormClosing);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.ClientMainForm_FormClosed);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

