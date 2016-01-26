@@ -34,13 +34,14 @@
             this.console = new System.Windows.Forms.RichTextBox();
             this.zombieListView = new System.Windows.Forms.ListView();
             this.IP = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.Version = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.computerName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.username = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.OS = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.clientControl = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.restartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.killToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.Version = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.sendMessageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clientControl.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -96,30 +97,36 @@
             // IP
             // 
             this.IP.Text = "IP";
-            this.IP.Width = 150;
+            this.IP.Width = 100;
+            // 
+            // Version
+            // 
+            this.Version.Text = "Version";
+            this.Version.Width = 90;
             // 
             // computerName
             // 
             this.computerName.Text = "Computer Name";
-            this.computerName.Width = 150;
+            this.computerName.Width = 120;
             // 
             // username
             // 
             this.username.Text = "Username";
-            this.username.Width = 150;
+            this.username.Width = 70;
             // 
             // OS
             // 
             this.OS.Text = "OS";
-            this.OS.Width = 150;
+            this.OS.Width = 110;
             // 
             // clientControl
             // 
             this.clientControl.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.sendMessageToolStripMenuItem,
             this.restartToolStripMenuItem,
             this.killToolStripMenuItem});
             this.clientControl.Name = "clientControl";
-            this.clientControl.Size = new System.Drawing.Size(111, 48);
+            this.clientControl.Size = new System.Drawing.Size(150, 70);
             // 
             // restartToolStripMenuItem
             // 
@@ -135,9 +142,11 @@
             this.killToolStripMenuItem.Text = "Kill";
             this.killToolStripMenuItem.Click += new System.EventHandler(this.killToolStripMenuItem_Click);
             // 
-            // Version
+            // sendMessageToolStripMenuItem
             // 
-            this.Version.Text = "Version";
+            this.sendMessageToolStripMenuItem.Name = "sendMessageToolStripMenuItem";
+            this.sendMessageToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.sendMessageToolStripMenuItem.Text = "Send Message";
             // 
             // ServerMainForm
             // 
@@ -171,6 +180,7 @@
         private System.Windows.Forms.ToolStripMenuItem killToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem restartToolStripMenuItem;
         private System.Windows.Forms.ColumnHeader Version;
+        private System.Windows.Forms.ToolStripMenuItem sendMessageToolStripMenuItem;
     }
 }
 

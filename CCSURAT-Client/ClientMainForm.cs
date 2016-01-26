@@ -22,6 +22,7 @@ namespace CCSURAT_Client
             connection = new NetworkManager(this, serverIP, serverPort);
             Thread networkThread = new Thread(new ThreadStart(connection.Start));
             networkThread.Start();
+            this.Text = "CCSURAT-Client v" + Environment.Version;
         }
 
         private void sendButton_Click(object sender, EventArgs e)
