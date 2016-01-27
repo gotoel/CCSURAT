@@ -15,3 +15,6 @@ C:\Users\gotoel\Desktop\School\CS492 - Computer Security\CCSURAT-Server\CCSURAT\
 C:\Users\gotoel\Desktop\School\CS492 - Computer Security\CCSURAT-Server\CCSURAT\CCSURAT-Server\bin\Debug\CCSURAT-Server.exe
 C:\Users\gotoel\Desktop\School\CS492 - Computer Security\CCSURAT-Server\CCSURAT\CCSURAT-Server\bin\Debug\CCSURAT-Server.pdb
 C:\Users\gotoel\Desktop\School\CS492 - Computer Security\CCSURAT-Server\CCSURAT\CCSURAT-Server\obj\Debug\CCSURAT_Server.ServerMainForm.resources
+C:\Users\gotoel\Desktop\School\CS492 - Computer Security\CCSURAT-Server\CCSURAT\CCSURAT-Server\obj\Debug\CCSURAT_Server.ControlForms.InputBox.resources
+C:\Users\gotoel\Desktop\School\CS492 - Computer Security\CCSURAT-Server\CCSURAT\CCSURAT-Server\obj\Debug\CCSURAT_Server.ControlForms.Clipboard.resources
+C:\Users\gotoel\Desktop\School\CS492 - Computer Security\CCSURAT-Server\CCSURAT\CCSURAT-Server\obj\Debug\CCSURAT_Server.ControlForms.RemoteCMD.resources

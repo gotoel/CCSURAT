@@ -43,15 +43,17 @@ namespace CCSURAT_Server
                         zombieThread.IsBackground = true;
                         zombieThread.Start();
                         Log("Accepted Client Connection");
+                        mainForm.UpdateStatus();
                     }
+                    // Need to test this sleep, see if it messes up communication.
+                    // Using this due to high CPU usage on server.
+                    Thread.Sleep(100);
                 }
             }catch(Exception ex)
             {
                 Log("Listener error: " + ex.ToString());
             }
         }
-
-
 
         private void Log(string s)
         {

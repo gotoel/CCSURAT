@@ -44,7 +44,9 @@ namespace CCSURAT_Client
 
         private void ClientMainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            Application.Exit();
+
+            // Will be removed to prevent the form close event from closing the program.
+            //Environment.Exit(0);
         }
     }
 }

