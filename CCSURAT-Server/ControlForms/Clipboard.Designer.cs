@@ -28,56 +28,62 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             this.clipboardTextbox = new System.Windows.Forms.TextBox();
-            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.setToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.refreshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.contextMenuStrip1.SuspendLayout();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.setClipboardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.getClipboardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // clipboardTextbox
             // 
-            this.clipboardTextbox.ContextMenuStrip = this.contextMenuStrip1;
-            this.clipboardTextbox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.clipboardTextbox.Location = new System.Drawing.Point(0, 0);
+            this.clipboardTextbox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.clipboardTextbox.Location = new System.Drawing.Point(0, 27);
             this.clipboardTextbox.Multiline = true;
             this.clipboardTextbox.Name = "clipboardTextbox";
-            this.clipboardTextbox.Size = new System.Drawing.Size(674, 282);
+            this.clipboardTextbox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.clipboardTextbox.Size = new System.Drawing.Size(674, 255);
             this.clipboardTextbox.TabIndex = 0;
             // 
-            // contextMenuStrip1
+            // menuStrip1
             // 
-            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.setToolStripMenuItem,
-            this.refreshToolStripMenuItem});
-            this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(114, 48);
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.setClipboardToolStripMenuItem,
+            this.getClipboardToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(674, 24);
+            this.menuStrip1.TabIndex = 1;
+            this.menuStrip1.Text = "menuStrip1";
             // 
-            // setToolStripMenuItem
+            // setClipboardToolStripMenuItem
             // 
-            this.setToolStripMenuItem.Name = "setToolStripMenuItem";
-            this.setToolStripMenuItem.Size = new System.Drawing.Size(113, 22);
-            this.setToolStripMenuItem.Text = "Set";
-            this.setToolStripMenuItem.Click += new System.EventHandler(this.setToolStripMenuItem_Click);
+            this.setClipboardToolStripMenuItem.Name = "setClipboardToolStripMenuItem";
+            this.setClipboardToolStripMenuItem.Size = new System.Drawing.Size(90, 20);
+            this.setClipboardToolStripMenuItem.Text = "Set Clipboard";
+            this.setClipboardToolStripMenuItem.Click += new System.EventHandler(this.setClipboardToolStripMenuItem_Click);
             // 
-            // refreshToolStripMenuItem
+            // getClipboardToolStripMenuItem
             // 
-            this.refreshToolStripMenuItem.Name = "refreshToolStripMenuItem";
-            this.refreshToolStripMenuItem.Size = new System.Drawing.Size(113, 22);
-            this.refreshToolStripMenuItem.Text = "Refresh";
-            this.refreshToolStripMenuItem.Click += new System.EventHandler(this.refreshToolStripMenuItem_Click);
+            this.getClipboardToolStripMenuItem.Name = "getClipboardToolStripMenuItem";
+            this.getClipboardToolStripMenuItem.Size = new System.Drawing.Size(92, 20);
+            this.getClipboardToolStripMenuItem.Text = "Get Clipboard";
+            this.getClipboardToolStripMenuItem.Click += new System.EventHandler(this.getClipboardToolStripMenuItem_Click);
             // 
             // Clipboard
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(674, 282);
+            this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.clipboardTextbox);
             this.Name = "Clipboard";
             this.Text = "Clipboard";
             this.Load += new System.EventHandler(this.Clipboard_Load);
-            this.contextMenuStrip1.ResumeLayout(false);
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -86,8 +92,8 @@
         #endregion
 
         private System.Windows.Forms.TextBox clipboardTextbox;
-        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
-        private System.Windows.Forms.ToolStripMenuItem setToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem refreshToolStripMenuItem;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem setClipboardToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem getClipboardToolStripMenuItem;
     }
 }

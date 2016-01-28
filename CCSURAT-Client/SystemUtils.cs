@@ -93,30 +93,12 @@ namespace CCSURAT_Client
         // #####################################################################################
         public static string GetClipboard()
         {
-            IDataObject idat = null;
-            Exception threadEx = null;
-            Thread staThread = new Thread(
-                delegate ()
-                {
-                    try
-                    {
-                        idat = Clipboard.GetDataObject();
-                    }
-
-                    catch (Exception ex)
-                    {
-                        threadEx = ex;
-                    }
-                });
-            staThread.SetApartmentState(ApartmentState.STA);
-            staThread.Start();
-            staThread.Join();
-            string clipboard = Clipboard.GetData("").ToString();
-            if (clipboard == string.Empty)
-            {
-                return "[[EMPTY]]";
-            }
-            return clipboard;
+            IDataObject iData = Clipboard.GetDataObject();
+            return Clipboard.GetData(DataFormats.Text).ToString();
+        }
+        public static void SetClipboard(string s)
+        {
+            Clipboard.SetText(s);
         }
     }
 }

