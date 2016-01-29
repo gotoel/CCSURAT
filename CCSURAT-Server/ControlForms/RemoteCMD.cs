@@ -27,9 +27,7 @@ namespace CCSURAT_Server.ControlForms
         // Send a command to the client's spawned cmd prompt
         private void cmdSendButton_Click(object sender, EventArgs e)
         {
-            zombie.SendData("[[REMOTECMD]]" + cmdTextbox.Text + "[[/REMOTECMD]]");
-            cmdTextbox.Text = string.Empty;
-            GetData();
+            SendData();
         }
 
         // Append data to "command prompt"
@@ -66,6 +64,13 @@ namespace CCSURAT_Server.ControlForms
             string data = zombie.CMDData;
             zombie.CMDData = string.Empty;
             AddToTextbox(data);
+        }
+
+        private void SendData()
+        {
+            zombie.SendData("[[REMOTECMD]]" + cmdTextbox.Text + "[[/REMOTECMD]]");
+            cmdTextbox.Text = string.Empty;
+            GetData();
         }
 
         private void Start()

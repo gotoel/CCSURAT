@@ -18,11 +18,6 @@ namespace CCSURAT_Server.ControlForms
             InitializeComponent();
         }
 
-        private void InputBox_Load(object sender, EventArgs e)
-        {
-
-        }
-
         public string Show(string info)
         {
             this.Text = "InputBox";

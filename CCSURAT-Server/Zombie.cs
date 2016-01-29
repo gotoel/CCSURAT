@@ -65,7 +65,7 @@ namespace CCSURAT_Server
                     }
                     // Need to test this sleep, see if it messes up communication.
                     // Using this due to high CPU usage on server.
-                    //Thread.Sleep(100);
+                    Thread.Sleep(1);
                 }
             }
             catch (Exception ex)

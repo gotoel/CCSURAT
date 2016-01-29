@@ -1,4 +1,6 @@
-﻿namespace CCSURAT_Server.ControlForms
+﻿using System.Windows.Forms;
+
+namespace CCSURAT_Server.ControlForms
 {
     partial class RemoteCMD
     {
@@ -107,6 +109,7 @@
             // 
             // RemoteCMD
             // 
+            this.AcceptButton = this.cmdSendButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(559, 438);
