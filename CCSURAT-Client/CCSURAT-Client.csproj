@@ -72,6 +72,7 @@
       <DependentUpon>ClientMainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Control\RemoteCMD.cs" />
+    <Compile Include="Control\RemoteDesktop.cs" />
     <Compile Include="NetworkManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

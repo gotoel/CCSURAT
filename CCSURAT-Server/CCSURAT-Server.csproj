@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ControlClasses\Monitor.cs" />
     <Compile Include="ControlForms\Clipboard.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -72,6 +73,12 @@
       <DependentUpon>RemoteDownloader.cs</DependentUpon>
     </Compile>
     <Compile Include="Listener.cs" />
+    <Compile Include="ControlForms\RemoteDesktop.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ControlForms\RemoteDesktop.Designer.cs">
+      <DependentUpon>RemoteDesktop.cs</DependentUpon>
+    </Compile>
     <Compile Include="ServerMainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -89,6 +96,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ControlForms\RemoteCMD.resx">
       <DependentUpon>RemoteCMD.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ControlForms\RemoteDesktop.resx">
+      <DependentUpon>RemoteDesktop.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ControlForms\RemoteDownloader.resx">
       <DependentUpon>RemoteDownloader.cs</DependentUpon>

