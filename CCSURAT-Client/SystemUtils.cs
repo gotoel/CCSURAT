@@ -97,7 +97,11 @@ namespace CCSURAT_Client
         public static string GetClipboard()
         {
             IDataObject iData = Clipboard.GetDataObject();
-            return Clipboard.GetData(DataFormats.Text).ToString();
+            string clipboardData = Clipboard.GetData(DataFormats.Text).ToString();
+            if (clipboardData != string.Empty)
+                return clipboardData;
+            else
+                return "[[EMPTY]]";
         }
         public static void SetClipboard(string s)
         {

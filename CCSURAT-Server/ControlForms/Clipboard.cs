@@ -18,7 +18,7 @@ namespace CCSURAT_Server.ControlForms
         {
             InitializeComponent();
             this.zombie = zombie;
-            this.Text = zombie.IP + " " + zombie.computerName + " Clipboard Manager";
+            this.Text = zombie.IP + " - " + zombie.computerName + " - Clipboard Manager";
         }
 
         private void Clipboard_Load(object sender, EventArgs e)

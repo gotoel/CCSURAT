@@ -12,6 +12,7 @@ namespace CCSURAT_Server
         // Port that we will listen to connection on.
         private static int listenPort = 7777;
 
+        // Main listener and list of listeners (each port)
         private Listener listener;
         private List<Listener> listeners;
 
@@ -20,10 +21,14 @@ namespace CCSURAT_Server
         private ListViewHitTestInfo selected;
         private int totalConnections;
 
+        // Performance monitoring
+        private PerformanceMonitor perfMon;
+
         public ServerMainForm()
         {
             InitializeComponent();
             listeners = new List<Listener>();
+            perfMon = new PerformanceMonitor();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -34,6 +39,9 @@ namespace CCSURAT_Server
             // start ping timer that pings clients every x seconds.
             pingTimer.Start();
             this.Text = "CCSURAT-Server v" + Application.ProductVersion;
+
+            // start performance monitor timer
+            perfTimer.Start();
 
             zombieListView.ControlRemoved += new System.Windows.Forms.ControlEventHandler(this.zombieListView_ControlRemoved);
             //this.ControlAdded += new System.Windows.Forms.ControlEventHandler(this.Control_Added);
@@ -250,6 +258,28 @@ namespace CCSURAT_Server
                         remoteDesktop.Show();
                     }
                 }
+        }
+
+        // Performance timer tick.
+        private void perfTimer_Tick(object sender, EventArgs e)
+        {
+            // Update performance labels.
+            if (!disablePerfCheckbox.Checked)
+            {
+                cpuUsageLabel.Text = "CPU Usage: " + perfMon.GetCpuUsage() + "%";
+                ramUsageLabel.Text = "RAM Usage: " + perfMon.GetRamUsage() + "MB";
+                // Try to get the main NIC information, put N/A if it errors out.
+                try {
+                    networkPerfGroupbox.Text = "Network: " + perfMon.mainNIC.Name;
+                    upSpeedLabel.Text = "UP: " + perfMon.GetUpSpeed() + " KB/s";
+                    downSpeedLabel.Text = "DOWN: " + perfMon.GetDownSpeed() + " KB/s";
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine("Network perf error:  " + ex.ToString());
+                    networkPerfGroupbox.Text = "Network: N/A";
+                }
+            }
         }
     }
 

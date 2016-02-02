@@ -46,9 +46,11 @@
             this.clientControl = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.clipboardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sendMessageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.remoteCMDToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.remoteDesktopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.remoteDownloadToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.restartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.killToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -64,10 +66,20 @@
             this.clientsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.remoteDownloadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pingTimer = new System.Windows.Forms.Timer(this.components);
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.networkPerfGroupbox = new System.Windows.Forms.GroupBox();
+            this.downSpeedLabel = new System.Windows.Forms.Label();
+            this.upSpeedLabel = new System.Windows.Forms.Label();
+            this.ramUsageLabel = new System.Windows.Forms.Label();
+            this.cpuUsageLabel = new System.Windows.Forms.Label();
+            this.perfTimer = new System.Windows.Forms.Timer(this.components);
+            this.disablePerfCheckbox = new System.Windows.Forms.CheckBox();
             this.clientControl.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.removeControl.SuspendLayout();
             this.serverControl.SuspendLayout();
+            this.groupBox2.SuspendLayout();
+            this.networkPerfGroupbox.SuspendLayout();
             this.SuspendLayout();
             // 
             // sendButton
@@ -86,9 +98,9 @@
             // 
             this.cmdTextbox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.cmdTextbox.Location = new System.Drawing.Point(457, 502);
+            this.cmdTextbox.Location = new System.Drawing.Point(620, 502);
             this.cmdTextbox.Name = "cmdTextbox";
-            this.cmdTextbox.Size = new System.Drawing.Size(643, 20);
+            this.cmdTextbox.Size = new System.Drawing.Size(480, 20);
             this.cmdTextbox.TabIndex = 4;
             // 
             // console
@@ -98,10 +110,10 @@
             this.console.BackColor = System.Drawing.Color.Black;
             this.console.Font = new System.Drawing.Font("Verdana", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.console.ForeColor = System.Drawing.Color.Lime;
-            this.console.Location = new System.Drawing.Point(304, 323);
+            this.console.Location = new System.Drawing.Point(490, 323);
             this.console.Name = "console";
             this.console.ReadOnly = true;
-            this.console.Size = new System.Drawing.Size(877, 173);
+            this.console.Size = new System.Drawing.Size(691, 173);
             this.console.TabIndex = 3;
             this.console.Text = "";
             // 
@@ -190,13 +202,15 @@
             this.clientControl.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.clipboardToolStripMenuItem,
             this.sendMessageToolStripMenuItem,
+            this.toolStripSeparator1,
             this.remoteCMDToolStripMenuItem,
             this.remoteDesktopToolStripMenuItem,
             this.remoteDownloadToolStripMenuItem1,
+            this.toolStripSeparator2,
             this.restartToolStripMenuItem,
             this.killToolStripMenuItem});
             this.clientControl.Name = "clientControl";
-            this.clientControl.Size = new System.Drawing.Size(173, 158);
+            this.clientControl.Size = new System.Drawing.Size(173, 170);
             // 
             // clipboardToolStripMenuItem
             // 
@@ -211,6 +225,11 @@
             this.sendMessageToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
             this.sendMessageToolStripMenuItem.Text = "Send Message";
             this.sendMessageToolStripMenuItem.Click += new System.EventHandler(this.sendMessageToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(169, 6);
             // 
             // remoteCMDToolStripMenuItem
             // 
@@ -233,6 +252,11 @@
             this.remoteDownloadToolStripMenuItem1.Text = "Remote Download";
             this.remoteDownloadToolStripMenuItem1.Click += new System.EventHandler(this.remoteDownloadToolStripMenuItem1_Click);
             // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(169, 6);
+            // 
             // restartToolStripMenuItem
             // 
             this.restartToolStripMenuItem.Name = "restartToolStripMenuItem";
@@ -254,9 +278,9 @@
             this.groupBox1.Controls.Add(this.totalConLabel);
             this.groupBox1.Controls.Add(this.curConLabel);
             this.groupBox1.Font = new System.Drawing.Font("Verdana", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox1.Location = new System.Drawing.Point(2, 323);
+            this.groupBox1.Location = new System.Drawing.Point(2, 324);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(296, 173);
+            this.groupBox1.Size = new System.Drawing.Size(300, 172);
             this.groupBox1.TabIndex = 7;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Status";
@@ -302,7 +326,7 @@
             this.disableConsoleCheckbox.Checked = true;
             this.disableConsoleCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.disableConsoleCheckbox.Font = new System.Drawing.Font("Verdana", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.disableConsoleCheckbox.Location = new System.Drawing.Point(304, 501);
+            this.disableConsoleCheckbox.Location = new System.Drawing.Point(490, 503);
             this.disableConsoleCheckbox.Name = "disableConsoleCheckbox";
             this.disableConsoleCheckbox.Size = new System.Drawing.Size(124, 18);
             this.disableConsoleCheckbox.TabIndex = 2;
@@ -371,11 +395,97 @@
             this.pingTimer.Interval = 2000;
             this.pingTimer.Tick += new System.EventHandler(this.pingTimer_Tick);
             // 
+            // groupBox2
+            // 
+            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.groupBox2.Controls.Add(this.networkPerfGroupbox);
+            this.groupBox2.Controls.Add(this.ramUsageLabel);
+            this.groupBox2.Controls.Add(this.cpuUsageLabel);
+            this.groupBox2.Font = new System.Drawing.Font("Verdana", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupBox2.Location = new System.Drawing.Point(308, 324);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(176, 173);
+            this.groupBox2.TabIndex = 8;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Performance";
+            // 
+            // networkPerfGroupbox
+            // 
+            this.networkPerfGroupbox.Controls.Add(this.downSpeedLabel);
+            this.networkPerfGroupbox.Controls.Add(this.upSpeedLabel);
+            this.networkPerfGroupbox.Font = new System.Drawing.Font("Verdana", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.networkPerfGroupbox.Location = new System.Drawing.Point(6, 87);
+            this.networkPerfGroupbox.Name = "networkPerfGroupbox";
+            this.networkPerfGroupbox.Size = new System.Drawing.Size(164, 81);
+            this.networkPerfGroupbox.TabIndex = 5;
+            this.networkPerfGroupbox.TabStop = false;
+            this.networkPerfGroupbox.Text = "Network: N/A";
+            // 
+            // downSpeedLabel
+            // 
+            this.downSpeedLabel.AutoSize = true;
+            this.downSpeedLabel.Font = new System.Drawing.Font("Verdana", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.downSpeedLabel.Location = new System.Drawing.Point(20, 46);
+            this.downSpeedLabel.Name = "downSpeedLabel";
+            this.downSpeedLabel.Size = new System.Drawing.Size(55, 16);
+            this.downSpeedLabel.TabIndex = 7;
+            this.downSpeedLabel.Text = "DOWN:";
+            // 
+            // upSpeedLabel
+            // 
+            this.upSpeedLabel.AutoSize = true;
+            this.upSpeedLabel.Font = new System.Drawing.Font("Verdana", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.upSpeedLabel.Location = new System.Drawing.Point(44, 30);
+            this.upSpeedLabel.Name = "upSpeedLabel";
+            this.upSpeedLabel.Size = new System.Drawing.Size(36, 16);
+            this.upSpeedLabel.TabIndex = 6;
+            this.upSpeedLabel.Text = "UP: ";
+            // 
+            // ramUsageLabel
+            // 
+            this.ramUsageLabel.AutoSize = true;
+            this.ramUsageLabel.Font = new System.Drawing.Font("Verdana", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ramUsageLabel.Location = new System.Drawing.Point(14, 53);
+            this.ramUsageLabel.Name = "ramUsageLabel";
+            this.ramUsageLabel.Size = new System.Drawing.Size(113, 16);
+            this.ramUsageLabel.TabIndex = 4;
+            this.ramUsageLabel.Text = "RAM Usage: 0%";
+            // 
+            // cpuUsageLabel
+            // 
+            this.cpuUsageLabel.AutoSize = true;
+            this.cpuUsageLabel.Font = new System.Drawing.Font("Verdana", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cpuUsageLabel.Location = new System.Drawing.Point(16, 32);
+            this.cpuUsageLabel.Name = "cpuUsageLabel";
+            this.cpuUsageLabel.Size = new System.Drawing.Size(111, 16);
+            this.cpuUsageLabel.TabIndex = 3;
+            this.cpuUsageLabel.Text = "CPU Usage: 0%";
+            // 
+            // perfTimer
+            // 
+            this.perfTimer.Interval = 1000;
+            this.perfTimer.Tick += new System.EventHandler(this.perfTimer_Tick);
+            // 
+            // disablePerfCheckbox
+            // 
+            this.disablePerfCheckbox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.disablePerfCheckbox.AutoSize = true;
+            this.disablePerfCheckbox.Font = new System.Drawing.Font("Verdana", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.disablePerfCheckbox.Location = new System.Drawing.Point(319, 502);
+            this.disablePerfCheckbox.Name = "disablePerfCheckbox";
+            this.disablePerfCheckbox.Size = new System.Drawing.Size(155, 18);
+            this.disablePerfCheckbox.TabIndex = 9;
+            this.disablePerfCheckbox.Text = "Disable performance";
+            this.disablePerfCheckbox.UseVisualStyleBackColor = true;
+            // 
             // ServerMainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1187, 525);
+            this.Controls.Add(this.disablePerfCheckbox);
+            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.serverControl);
             this.Controls.Add(this.disableConsoleCheckbox);
             this.Controls.Add(this.groupBox1);
@@ -395,6 +505,10 @@
             this.removeControl.ResumeLayout(false);
             this.serverControl.ResumeLayout(false);
             this.serverControl.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
+            this.networkPerfGroupbox.ResumeLayout(false);
+            this.networkPerfGroupbox.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -437,6 +551,16 @@
         private System.Windows.Forms.ColumnHeader Ping;
         private System.Windows.Forms.Timer pingTimer;
         private System.Windows.Forms.ToolStripMenuItem remoteDesktopToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.Timer perfTimer;
+        private System.Windows.Forms.Label cpuUsageLabel;
+        private System.Windows.Forms.CheckBox disablePerfCheckbox;
+        private System.Windows.Forms.Label ramUsageLabel;
+        private System.Windows.Forms.GroupBox networkPerfGroupbox;
+        private System.Windows.Forms.Label downSpeedLabel;
+        private System.Windows.Forms.Label upSpeedLabel;
     }
 }
 

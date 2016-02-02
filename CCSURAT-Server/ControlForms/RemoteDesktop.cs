@@ -18,7 +18,7 @@ namespace CCSURAT_Server
         {
             InitializeComponent();
             this.zombie = zombie;
-            this.Text = zombie.IP + " " + zombie.computerName + " Remote Desktop";
+            this.Text = zombie.IP + " - " + zombie.computerName + " - Remote Desktop";
             GetMonitors();
         }
 

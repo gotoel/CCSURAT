@@ -216,6 +216,9 @@ namespace CCSURAT_Server
                         case "MONITORS":
                             ParseMonitorInfo(data);
                             break;
+                        case "PING":
+                            // If client-side pinging is implemented.
+                            break;
                     }
                 }
                 catch (Exception ex)

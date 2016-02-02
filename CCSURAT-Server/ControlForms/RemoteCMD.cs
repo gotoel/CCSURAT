@@ -21,7 +21,7 @@ namespace CCSURAT_Server.ControlForms
             this.zombie = zombie;
             cmdTextbox.Enabled = false;
             cmdSendButton.Enabled = false;
-            this.Text = zombie.IP + " " + zombie.computerName + " Remote CMD";
+            this.Text = zombie.IP + " - " + zombie.computerName + " - Remote CMD";
         }
 
         // Send a command to the client's spawned cmd prompt
