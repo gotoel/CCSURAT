@@ -7,6 +7,6 @@
 
 ##### Screenshots (Differ in version of software):
 ###### Latest:
-![alt tag](http://i.imgur.com/VvdIx4W.png)
+![alt tag](http://i.imgur.com/qHk2r0v.png)
 ###### OS Support:
 ![alt tag](http://i.imgur.com/1kxZWcE.png)
