@@ -19,7 +19,7 @@ namespace CCSURAT_Server.ControlForms
             InitializeComponent();
             this.zombie = zombie;
             hiddenRadioButton.Checked = true;
-            this.Text = zombie.IP + " " + zombie.computerName + " Remote Downloader";
+            this.Text = zombie.IP + " - " + zombie.computerName + " - Remote Downloader";
         }
 
         // Seperate constructer to allow opening a single downloader for all online clients
@@ -30,11 +30,6 @@ namespace CCSURAT_Server.ControlForms
             this.zombies = zombies;
             hiddenRadioButton.Checked = true;
             this.Text = "ALL ONLINE CLIENTS - Remote Downloader";
-        }
-
-        private void RemoteDownloader_Load(object sender, EventArgs e)
-        {
-
         }
 
         private void downloadButton_Click(object sender, EventArgs e)

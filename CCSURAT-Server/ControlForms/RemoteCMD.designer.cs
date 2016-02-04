@@ -119,8 +119,8 @@ namespace CCSURAT_Server.ControlForms
             this.Controls.Add(this.cmdPromptTextbox);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "RemoteCMD";
+            this.ShowIcon = false;
             this.Text = "RemoteCMD";
-            this.Load += new System.EventHandler(this.RemoteCMD_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);

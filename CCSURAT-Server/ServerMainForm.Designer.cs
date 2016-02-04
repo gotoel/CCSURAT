@@ -29,10 +29,12 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ServerMainForm));
             this.sendButton = new System.Windows.Forms.Button();
             this.cmdTextbox = new System.Windows.Forms.TextBox();
             this.console = new System.Windows.Forms.RichTextBox();
             this.zombieListView = new System.Windows.Forms.ListView();
+            this.ID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.IP = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.Ping = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.Version = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -51,6 +53,8 @@
             this.remoteDesktopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.remoteDownloadToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.funToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.restartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.killToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -65,6 +69,7 @@
             this.listenOnPortToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clientsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.remoteDownloadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.buildToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pingTimer = new System.Windows.Forms.Timer(this.components);
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.networkPerfGroupbox = new System.Windows.Forms.GroupBox();
@@ -74,12 +79,17 @@
             this.cpuUsageLabel = new System.Windows.Forms.Label();
             this.perfTimer = new System.Windows.Forms.Timer(this.components);
             this.disablePerfCheckbox = new System.Windows.Forms.CheckBox();
+            this.taskbarIcon = new System.Windows.Forms.NotifyIcon(this.components);
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.windowManagerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.clientControl.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.removeControl.SuspendLayout();
             this.serverControl.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.networkPerfGroupbox.SuspendLayout();
+            this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
             // sendButton
@@ -105,15 +115,14 @@
             // 
             // console
             // 
-            this.console.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.console.BackColor = System.Drawing.Color.Black;
+            this.console.Dock = System.Windows.Forms.DockStyle.Fill;
             this.console.Font = new System.Drawing.Font("Verdana", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.console.ForeColor = System.Drawing.Color.Lime;
-            this.console.Location = new System.Drawing.Point(490, 323);
+            this.console.Location = new System.Drawing.Point(3, 22);
             this.console.Name = "console";
             this.console.ReadOnly = true;
-            this.console.Size = new System.Drawing.Size(691, 173);
+            this.console.Size = new System.Drawing.Size(685, 147);
             this.console.TabIndex = 3;
             this.console.Text = "";
             // 
@@ -125,6 +134,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.zombieListView.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.zombieListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.ID,
             this.IP,
             this.Ping,
             this.Version,
@@ -148,6 +158,11 @@
             this.zombieListView.KeyDown += new System.Windows.Forms.KeyEventHandler(this.zombieListView_KeyDown);
             this.zombieListView.MouseDown += new System.Windows.Forms.MouseEventHandler(this.zombieListView_MouseDown);
             // 
+            // ID
+            // 
+            this.ID.Text = "ID";
+            this.ID.Width = 80;
+            // 
             // IP
             // 
             this.IP.Text = "IP";
@@ -170,7 +185,7 @@
             // User
             // 
             this.User.Text = "User";
-            this.User.Width = 73;
+            this.User.Width = 70;
             // 
             // OS
             // 
@@ -207,10 +222,14 @@
             this.remoteDesktopToolStripMenuItem,
             this.remoteDownloadToolStripMenuItem1,
             this.toolStripSeparator2,
+            this.windowManagerToolStripMenuItem,
+            this.toolStripSeparator4,
+            this.funToolStripMenuItem,
+            this.toolStripSeparator3,
             this.restartToolStripMenuItem,
             this.killToolStripMenuItem});
             this.clientControl.Name = "clientControl";
-            this.clientControl.Size = new System.Drawing.Size(173, 170);
+            this.clientControl.Size = new System.Drawing.Size(173, 248);
             // 
             // clipboardToolStripMenuItem
             // 
@@ -256,6 +275,18 @@
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
             this.toolStripSeparator2.Size = new System.Drawing.Size(169, 6);
+            // 
+            // funToolStripMenuItem
+            // 
+            this.funToolStripMenuItem.Name = "funToolStripMenuItem";
+            this.funToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
+            this.funToolStripMenuItem.Text = "Fun";
+            this.funToolStripMenuItem.Click += new System.EventHandler(this.funToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(169, 6);
             // 
             // restartToolStripMenuItem
             // 
@@ -323,8 +354,6 @@
             this.disableConsoleCheckbox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.disableConsoleCheckbox.AutoSize = true;
-            this.disableConsoleCheckbox.Checked = true;
-            this.disableConsoleCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.disableConsoleCheckbox.Font = new System.Drawing.Font("Verdana", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.disableConsoleCheckbox.Location = new System.Drawing.Point(490, 503);
             this.disableConsoleCheckbox.Name = "disableConsoleCheckbox";
@@ -351,7 +380,8 @@
             // 
             this.serverControl.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.controlToolStripMenuItem,
-            this.clientsToolStripMenuItem});
+            this.clientsToolStripMenuItem,
+            this.buildToolStripMenuItem});
             this.serverControl.Location = new System.Drawing.Point(0, 0);
             this.serverControl.Name = "serverControl";
             this.serverControl.Size = new System.Drawing.Size(1187, 24);
@@ -364,8 +394,8 @@
             this.listenOnPortToolStripMenuItem});
             this.controlToolStripMenuItem.Font = new System.Drawing.Font("Verdana", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.controlToolStripMenuItem.Name = "controlToolStripMenuItem";
-            this.controlToolStripMenuItem.Size = new System.Drawing.Size(65, 20);
-            this.controlToolStripMenuItem.Text = "Control";
+            this.controlToolStripMenuItem.Size = new System.Drawing.Size(60, 20);
+            this.controlToolStripMenuItem.Text = "Server";
             // 
             // listenOnPortToolStripMenuItem
             // 
@@ -389,6 +419,12 @@
             this.remoteDownloadToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
             this.remoteDownloadToolStripMenuItem.Text = "Remote Download";
             this.remoteDownloadToolStripMenuItem.Click += new System.EventHandler(this.remoteDownloadToolStripMenuItem_Click);
+            // 
+            // buildToolStripMenuItem
+            // 
+            this.buildToolStripMenuItem.Name = "buildToolStripMenuItem";
+            this.buildToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
+            this.buildToolStripMenuItem.Text = "Build";
             // 
             // pingTimer
             // 
@@ -479,11 +515,42 @@
             this.disablePerfCheckbox.Text = "Disable performance";
             this.disablePerfCheckbox.UseVisualStyleBackColor = true;
             // 
+            // taskbarIcon
+            // 
+            this.taskbarIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("taskbarIcon.Icon")));
+            this.taskbarIcon.Text = "CCSURAT-Server";
+            this.taskbarIcon.Visible = true;
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.groupBox3.Controls.Add(this.console);
+            this.groupBox3.Font = new System.Drawing.Font("Verdana", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupBox3.Location = new System.Drawing.Point(490, 324);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(691, 172);
+            this.groupBox3.TabIndex = 8;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Console";
+            // 
+            // windowManagerToolStripMenuItem
+            // 
+            this.windowManagerToolStripMenuItem.Name = "windowManagerToolStripMenuItem";
+            this.windowManagerToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
+            this.windowManagerToolStripMenuItem.Text = "Window Manager";
+            this.windowManagerToolStripMenuItem.Click += new System.EventHandler(this.windowManagerToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(169, 6);
+            // 
             // ServerMainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1187, 525);
+            this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.disablePerfCheckbox);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.serverControl);
@@ -492,8 +559,8 @@
             this.Controls.Add(this.zombieListView);
             this.Controls.Add(this.sendButton);
             this.Controls.Add(this.cmdTextbox);
-            this.Controls.Add(this.console);
             this.DoubleBuffered = true;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.serverControl;
             this.MinimumSize = new System.Drawing.Size(600, 480);
             this.Name = "ServerMainForm";
@@ -509,6 +576,7 @@
             this.groupBox2.PerformLayout();
             this.networkPerfGroupbox.ResumeLayout(false);
             this.networkPerfGroupbox.PerformLayout();
+            this.groupBox3.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -561,6 +629,14 @@
         private System.Windows.Forms.GroupBox networkPerfGroupbox;
         private System.Windows.Forms.Label downSpeedLabel;
         private System.Windows.Forms.Label upSpeedLabel;
+        private System.Windows.Forms.ToolStripMenuItem buildToolStripMenuItem;
+        private System.Windows.Forms.ColumnHeader ID;
+        public System.Windows.Forms.NotifyIcon taskbarIcon;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.ToolStripMenuItem funToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripMenuItem windowManagerToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
     }
 }
 

@@ -201,6 +201,20 @@ namespace CCSURAT_Server
                 }
         }
 
+        // Open fun functions form
+        private void funToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (selected.Item != null)
+                foreach (ZombieListItem zItem in zombieListView.SelectedItems)
+                {
+                    if (zItem.ForeColor != Color.Gray)
+                    {
+                        Fun fun = new Fun(zItem.zombieClient);
+                        fun.Show();
+                    }
+                }
+        }
+
         // Create new listener on input port.
         private void listenOnPortToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -232,7 +246,6 @@ namespace CCSURAT_Server
         {
             if (e.KeyCode == Keys.A && e.Control)
             {
-                zombieListView.MultiSelect = true;
                 foreach (ListViewItem item in zombieListView.Items)
                     item.Selected = true;
             }
@@ -256,6 +269,19 @@ namespace CCSURAT_Server
                     {
                         RemoteDesktop remoteDesktop = new RemoteDesktop(zItem.zombieClient);
                         remoteDesktop.Show();
+                    }
+                }
+        }
+
+        private void windowManagerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (selected.Item != null)
+                foreach (ZombieListItem zItem in zombieListView.SelectedItems)
+                {
+                    if (zItem.ForeColor != Color.Gray)
+                    {
+                        WindowManager windowManager = new WindowManager(zItem.zombieClient);
+                        windowManager.Show();
                     }
                 }
         }

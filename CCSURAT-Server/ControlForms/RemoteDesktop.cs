@@ -19,7 +19,6 @@ namespace CCSURAT_Server
             InitializeComponent();
             this.zombie = zombie;
             this.Text = zombie.IP + " - " + zombie.computerName + " - Remote Desktop";
-            GetMonitors();
         }
 
         private void singleToolStripMenuItem_Click(object sender, EventArgs e)
@@ -127,6 +126,11 @@ namespace CCSURAT_Server
         private void trackBar1_Scroll(object sender, EventArgs e)
         {
             sizeTextbox.Text = imageSize.Value + "%";
+        }
+
+        private void RemoteDesktop_Shown(object sender, EventArgs e)
+        {
+            GetMonitors();
         }
     }
 }

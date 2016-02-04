@@ -13,7 +13,7 @@ namespace CCSURAT_Server
         // Process
         Process curProcess;
 
-        // CPU perf
+        // CPU
         private PerformanceCounter totalProcessTime;
 
         // Network
@@ -51,16 +51,19 @@ namespace CCSURAT_Server
             return (curProcess.WorkingSet64 / 1024 / 1024);
         }
 
+        // Get main NIC's current upload speed in KB
         public int GetUpSpeed()
         {
             return (int)(bytesSent.NextValue() / 1024);
         }
 
+        // Get main NIC's current download speed in KB
         public int GetDownSpeed()
         {
             return (int)(bytesReceived.NextValue() / 1024);
         }
 
+        // Find whichever NIC has a real IPv4 address and is up. This is the main NIC that we will monitor.
         private NetworkInterface GetMainNIC()
         {
             foreach (NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces())

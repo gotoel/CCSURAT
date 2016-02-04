@@ -80,8 +80,9 @@
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.clipboardTextbox);
             this.Name = "Clipboard";
+            this.ShowIcon = false;
             this.Text = "Clipboard";
-            this.Load += new System.EventHandler(this.Clipboard_Load);
+            this.Shown += new System.EventHandler(this.Clipboard_Shown);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);

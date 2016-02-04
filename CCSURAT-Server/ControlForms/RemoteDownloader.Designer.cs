@@ -48,13 +48,18 @@
             // 
             // urlTextbox
             // 
+            this.urlTextbox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.urlTextbox.Location = new System.Drawing.Point(101, 6);
+            this.urlTextbox.Multiline = true;
             this.urlTextbox.Name = "urlTextbox";
             this.urlTextbox.Size = new System.Drawing.Size(402, 20);
             this.urlTextbox.TabIndex = 1;
             // 
             // downloadButton
             // 
+            this.downloadButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.downloadButton.Location = new System.Drawing.Point(402, 104);
             this.downloadButton.Name = "downloadButton";
             this.downloadButton.Size = new System.Drawing.Size(101, 23);
@@ -89,6 +94,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Controls.Add(this.hiddenRadioButton);
             this.groupBox1.Controls.Add(this.visibleRadioButton);
             this.groupBox1.Location = new System.Drawing.Point(403, 32);
@@ -107,9 +113,10 @@
             this.Controls.Add(this.downloadButton);
             this.Controls.Add(this.urlTextbox);
             this.Controls.Add(this.label1);
+            this.MinimumSize = new System.Drawing.Size(525, 171);
             this.Name = "RemoteDownloader";
+            this.ShowIcon = false;
             this.Text = "RemoteDownloader";
-            this.Load += new System.EventHandler(this.RemoteDownloader_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);

@@ -116,11 +116,6 @@ namespace CCSURAT_Server.ControlForms
                 MessageBox.Show("Remote CMD is not running.");
         }
 
-        private void RemoteCMD_Load(object sender, EventArgs e)
-        {
-
-        }
-
         private void stopToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             Stop();

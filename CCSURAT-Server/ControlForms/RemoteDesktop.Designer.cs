@@ -270,8 +270,10 @@
             this.MainMenuStrip = this.menuStrip1;
             this.MinimumSize = new System.Drawing.Size(784, 550);
             this.Name = "RemoteDesktop";
+            this.ShowIcon = false;
             this.Text = "RemoteDesktop";
             this.Load += new System.EventHandler(this.RemoteDesktop_Load);
+            this.Shown += new System.EventHandler(this.RemoteDesktop_Shown);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
