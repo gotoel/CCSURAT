@@ -35,7 +35,8 @@
             // 
             // console
             // 
-            this.console.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.console.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.console.BackColor = System.Drawing.Color.Black;
             this.console.ForeColor = System.Drawing.Color.Lime;
@@ -48,6 +49,7 @@
             // 
             // cmdTextbox
             // 
+            this.cmdTextbox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cmdTextbox.Location = new System.Drawing.Point(2, 230);
             this.cmdTextbox.Name = "cmdTextbox";
             this.cmdTextbox.Size = new System.Drawing.Size(453, 20);
@@ -55,6 +57,7 @@
             // 
             // sendButton
             // 
+            this.sendButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.sendButton.Location = new System.Drawing.Point(458, 230);
             this.sendButton.Name = "sendButton";
             this.sendButton.Size = new System.Drawing.Size(75, 21);

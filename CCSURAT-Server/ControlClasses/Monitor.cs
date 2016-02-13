@@ -14,6 +14,7 @@ namespace CCSURAT_Server.ControlClasses
         private bool primary;
         private int x, y, width, height;
         private string name;
+        private Image screenImage;
 
         public Monitor(bool primary, int x, int y, int width, int height, string name)
         {
@@ -31,6 +32,9 @@ namespace CCSURAT_Server.ControlClasses
         public int getWidth() { return width; }
         public int getHeight() { return height; }
         public string deviceName() { return name; }
+
+        public void setScreenImage(Image i) { screenImage = i; }
+        public Image getScreenImage() { return screenImage; }
 
     }
 }

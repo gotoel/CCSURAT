@@ -2,8 +2,10 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace CCSURAT_Client.Control
 {
@@ -13,13 +15,58 @@ namespace CCSURAT_Client.Control
         private byte[] imageBytes;
 
 
+        // Native methods
+        [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
+        public static extern void mouse_event(long dwFlags, long dx, long dy, long cButtons, long dwExtraInfo);
+        private const int MOUSEEVENTF_LEFTDOWN = 0x02;
+        private const int MOUSEEVENTF_LEFTUP = 0x04;
+        private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
+        private const int MOUSEEVENTF_RIGHTUP = 0x10;
+
+        [DllImport("user32.dll")]
+        public static extern bool keybd_event(byte bVk, byte bScan, uint dwFlags, int dwExtraInfo);
+        public const int KEYEVENTF_KEYDOWN = 0x0001;
+        public const int KEYEVENTF_KEYUP = 0x0002;
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        static extern IntPtr GetForegroundWindow();
+
+        // Handle mouse click even at X/Y
+        public void MouseClick(long x, long y, string button)
+        {
+            Cursor.Position = new Point((int)x, (int)y);
+
+            // Button type support. TO-DO: Add more button support.
+            switch (button)
+            {
+                case "Left":
+                    mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, Cursor.Position.X, Cursor.Position.Y, 0, 0);
+                    break;
+                case "Right":
+                    mouse_event(MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_RIGHTUP, Cursor.Position.X, Cursor.Position.Y, 0, 0);
+                    break;
+            }
+        }
+
+        // Handle key press events using the key's keycode
+        // May need to add a KeyRelease function on server+client
+        public void KeyPress(string key)
+        {
+            keybd_event(Convert.ToByte(key), 0, KEYEVENTF_KEYDOWN, 0);
+            keybd_event(Convert.ToByte(key), 0, KEYEVENTF_KEYUP, 0);
+        }
+
         public byte[] GetScreenshot(string quality, string size, string deviceName)
         {
             try
             {
                 CreateScreenShot(Convert.ToInt64(quality), float.Parse(size), deviceName);
                 // Convert command tag open/close strings to byte arrays.
-                byte[] start = Encoding.ASCII.GetBytes("[[BINARY]][[SCREENSHOT]]");
+                byte[] start = Encoding.ASCII.GetBytes("[[BINARY]][[SCREENSHOT]]" + deviceName + "|*|");
                 byte[] end = Encoding.ASCII.GetBytes("[[/SCREENSHOT]][[/BINARY]]");
                 // Create a temp value to hold the image byte data padded with the command tag bytes.
                 byte[] temp = new byte[start.Length + end.Length + imageBytes.Length];
@@ -34,6 +81,7 @@ namespace CCSURAT_Client.Control
             }
         }
 
+        // Creates an image from a screenshot of the screen.
         private void CreateScreenShot(long quality, float size, string deviceName)
         {
             try

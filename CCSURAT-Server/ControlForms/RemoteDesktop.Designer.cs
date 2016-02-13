@@ -29,13 +29,13 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.screenImageBox = new System.Windows.Forms.PictureBox();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.startToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.singleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
-            this.checkBox2 = new System.Windows.Forms.CheckBox();
+            this.mouseControlCheckbox = new System.Windows.Forms.CheckBox();
+            this.keyboardControlCheckbox = new System.Windows.Forms.CheckBox();
             this.refreshInterval = new System.Windows.Forms.TrackBar();
             this.label1 = new System.Windows.Forms.Label();
             this.imageQuality = new System.Windows.Forms.TrackBar();
@@ -48,24 +48,26 @@
             this.sizeTextbox = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.imageSize = new System.Windows.Forms.TrackBar();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.screenImageBox)).BeginInit();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.refreshInterval)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageQuality)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageSize)).BeginInit();
             this.SuspendLayout();
             // 
-            // pictureBox1
+            // screenImageBox
             // 
-            this.pictureBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.screenImageBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.pictureBox1.Location = new System.Drawing.Point(0, 75);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(768, 436);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox1.TabIndex = 0;
-            this.pictureBox1.TabStop = false;
+            this.screenImageBox.Location = new System.Drawing.Point(0, 75);
+            this.screenImageBox.Name = "screenImageBox";
+            this.screenImageBox.Size = new System.Drawing.Size(768, 436);
+            this.screenImageBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.screenImageBox.TabIndex = 0;
+            this.screenImageBox.TabStop = false;
+            this.screenImageBox.Click += new System.EventHandler(this.pictureBox1_Click);
+            this.screenImageBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseClick);
             // 
             // menuStrip1
             // 
@@ -104,25 +106,25 @@
             this.singleToolStripMenuItem.Text = "Single";
             this.singleToolStripMenuItem.Click += new System.EventHandler(this.singleToolStripMenuItem_Click);
             // 
-            // checkBox1
+            // mouseControlCheckbox
             // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(12, 31);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(93, 17);
-            this.checkBox1.TabIndex = 2;
-            this.checkBox1.Text = "Enable mouse";
-            this.checkBox1.UseVisualStyleBackColor = true;
+            this.mouseControlCheckbox.AutoSize = true;
+            this.mouseControlCheckbox.Location = new System.Drawing.Point(12, 31);
+            this.mouseControlCheckbox.Name = "mouseControlCheckbox";
+            this.mouseControlCheckbox.Size = new System.Drawing.Size(93, 17);
+            this.mouseControlCheckbox.TabIndex = 2;
+            this.mouseControlCheckbox.Text = "Enable mouse";
+            this.mouseControlCheckbox.UseVisualStyleBackColor = true;
             // 
-            // checkBox2
+            // keyboardControlCheckbox
             // 
-            this.checkBox2.AutoSize = true;
-            this.checkBox2.Location = new System.Drawing.Point(111, 31);
-            this.checkBox2.Name = "checkBox2";
-            this.checkBox2.Size = new System.Drawing.Size(106, 17);
-            this.checkBox2.TabIndex = 3;
-            this.checkBox2.Text = "Enable keyboard";
-            this.checkBox2.UseVisualStyleBackColor = true;
+            this.keyboardControlCheckbox.AutoSize = true;
+            this.keyboardControlCheckbox.Location = new System.Drawing.Point(111, 31);
+            this.keyboardControlCheckbox.Name = "keyboardControlCheckbox";
+            this.keyboardControlCheckbox.Size = new System.Drawing.Size(106, 17);
+            this.keyboardControlCheckbox.TabIndex = 3;
+            this.keyboardControlCheckbox.Text = "Enable keyboard";
+            this.keyboardControlCheckbox.UseVisualStyleBackColor = true;
             // 
             // refreshInterval
             // 
@@ -263,10 +265,11 @@
             this.Controls.Add(this.imageQuality);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.refreshInterval);
-            this.Controls.Add(this.checkBox2);
-            this.Controls.Add(this.checkBox1);
-            this.Controls.Add(this.pictureBox1);
+            this.Controls.Add(this.keyboardControlCheckbox);
+            this.Controls.Add(this.mouseControlCheckbox);
+            this.Controls.Add(this.screenImageBox);
             this.Controls.Add(this.menuStrip1);
+            this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip1;
             this.MinimumSize = new System.Drawing.Size(784, 550);
             this.Name = "RemoteDesktop";
@@ -274,7 +277,9 @@
             this.Text = "RemoteDesktop";
             this.Load += new System.EventHandler(this.RemoteDesktop_Load);
             this.Shown += new System.EventHandler(this.RemoteDesktop_Shown);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.RemoteDesktop_KeyDown);
+            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.RemoteDesktop_KeyPress);
+            ((System.ComponentModel.ISupportInitialize)(this.screenImageBox)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.refreshInterval)).EndInit();
@@ -287,13 +292,13 @@
 
         #endregion
 
-        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.PictureBox screenImageBox;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem startToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem stopToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem singleToolStripMenuItem;
-        private System.Windows.Forms.CheckBox checkBox1;
-        private System.Windows.Forms.CheckBox checkBox2;
+        private System.Windows.Forms.CheckBox mouseControlCheckbox;
+        private System.Windows.Forms.CheckBox keyboardControlCheckbox;
         private System.Windows.Forms.TrackBar refreshInterval;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TrackBar imageQuality;

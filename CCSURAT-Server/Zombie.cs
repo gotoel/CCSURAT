@@ -92,6 +92,8 @@ namespace CCSURAT_Server
                                     Log("Data recieved: " + data);
 
                                 // If we are receiving binary data, place data into buffer.
+                                // To support things such as multiple monitors being viewed at once, we need to have some sort
+                                // of buffer collection.
                                 if (data.Contains("[[BINARY]]"))
                                     bufferBytes = true;
                                 if (bufferBytes)
@@ -251,8 +253,16 @@ namespace CCSURAT_Server
             {
                 start = 14; //length of screenshot command tag
                 length = data.Substring(start, data.IndexOf("[[/SCREENSHOT]]")).Length;
+
                 string temp = Encoding.ASCII.GetString(dataBuffer, 0, 1024);
+
                 start += 10; //length of binary command tag
+
+                // Extract monitor device name and the |*| splitter string from the data. 
+                string deviceName = temp.Split("|*|".ToCharArray(), StringSplitOptions.None)[0].Substring(start);
+                Log("DEVICENAME: " + deviceName);
+                start += deviceName.Length + 3; // + 3 for the |*| split string
+
                 start += temp.IndexOf("[[BINARY]]");
                 // Place extracted binary data into result
                 byte[] result = new byte[length];
@@ -264,6 +274,10 @@ namespace CCSURAT_Server
                 MemoryStream memoryStream = new MemoryStream(result);
                 // Grab the screen image form the memory stream
                 screenImage = Image.FromStream(memoryStream);
+                // Assigns screenImage to appropriate monitor
+                foreach (ControlClasses.Monitor m in monitors)
+                    if (m.deviceName().Equals(deviceName))
+                        m.setScreenImage(screenImage);
                 memoryStream.Close();
             }
         }

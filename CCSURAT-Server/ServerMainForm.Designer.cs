@@ -53,6 +53,8 @@
             this.remoteDesktopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.remoteDownloadToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.windowManagerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.funToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.restartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -81,8 +83,6 @@
             this.disablePerfCheckbox = new System.Windows.Forms.CheckBox();
             this.taskbarIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.windowManagerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.clientControl.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.removeControl.SuspendLayout();
@@ -229,7 +229,7 @@
             this.restartToolStripMenuItem,
             this.killToolStripMenuItem});
             this.clientControl.Name = "clientControl";
-            this.clientControl.Size = new System.Drawing.Size(173, 248);
+            this.clientControl.Size = new System.Drawing.Size(173, 226);
             // 
             // clipboardToolStripMenuItem
             // 
@@ -275,6 +275,18 @@
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
             this.toolStripSeparator2.Size = new System.Drawing.Size(169, 6);
+            // 
+            // windowManagerToolStripMenuItem
+            // 
+            this.windowManagerToolStripMenuItem.Name = "windowManagerToolStripMenuItem";
+            this.windowManagerToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
+            this.windowManagerToolStripMenuItem.Text = "Window Manager";
+            this.windowManagerToolStripMenuItem.Click += new System.EventHandler(this.windowManagerToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(169, 6);
             // 
             // funToolStripMenuItem
             // 
@@ -532,18 +544,6 @@
             this.groupBox3.TabIndex = 8;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Console";
-            // 
-            // windowManagerToolStripMenuItem
-            // 
-            this.windowManagerToolStripMenuItem.Name = "windowManagerToolStripMenuItem";
-            this.windowManagerToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
-            this.windowManagerToolStripMenuItem.Text = "Window Manager";
-            this.windowManagerToolStripMenuItem.Click += new System.EventHandler(this.windowManagerToolStripMenuItem_Click);
-            // 
-            // toolStripSeparator4
-            // 
-            this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(169, 6);
             // 
             // ServerMainForm
             // 

