@@ -85,7 +85,6 @@ namespace CCSURAT_Client
                         Log("Connection successful!");
 
                         ListenToCommands();
-                        Log("Listening to commands.");
                     }
                     catch (Exception ex)
                     {
@@ -103,6 +102,7 @@ namespace CCSURAT_Client
 
         private void ListenToCommands()
         {
+            Log("Listening to commands.");
             netStream = client.GetStream();
             try
             {
@@ -191,6 +191,8 @@ namespace CCSURAT_Client
 
         // Checks if the TCP socket is currently connected. 
         // Seems to work VERY well and may no longer need an IsAlive() method
+        // However this only seems to work if the socket is closed (gracefully/forcibly) - but not if
+        // connection is closed on the server, such as internet conenction being lost
         public static bool IsSocketConnected(Socket socket)
         {
             try

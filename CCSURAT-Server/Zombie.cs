@@ -400,14 +400,19 @@ namespace CCSURAT_Server
         // item to gray color.
         private void RemoveFromListView()
         {
-            if (zombieListView.InvokeRequired)
+            try {
+                if (zombieListView.InvokeRequired)
+                {
+                    zombieListView.Invoke(new Action(RemoveFromListView));
+                    return;
+                }
+                //zombieListView.Items.Remove(this.zombieItem);
+                mainForm.zombies.Remove(this);
+                zombieItem.ForeColor = Color.Gray;
+            } catch(Exception ex)
             {
-                zombieListView.Invoke(new Action(RemoveFromListView));
-                return;
+                Log("Error removing client object: " + ex.ToString());
             }
-            //zombieListView.Items.Remove(this.zombieItem);
-            mainForm.zombies.Remove(this);
-            zombieItem.ForeColor = Color.Gray;
         }
 
         // Parse the data and set the client's system info
