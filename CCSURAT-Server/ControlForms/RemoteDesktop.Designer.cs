@@ -60,14 +60,15 @@
             this.screenImageBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.screenImageBox.Location = new System.Drawing.Point(0, 75);
+            this.screenImageBox.Location = new System.Drawing.Point(0, 80);
             this.screenImageBox.Name = "screenImageBox";
-            this.screenImageBox.Size = new System.Drawing.Size(768, 436);
+            this.screenImageBox.Size = new System.Drawing.Size(768, 431);
             this.screenImageBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.screenImageBox.TabIndex = 0;
             this.screenImageBox.TabStop = false;
-            this.screenImageBox.Click += new System.EventHandler(this.pictureBox1_Click);
-            this.screenImageBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseClick);
+            this.screenImageBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.screenImageBox_MouseDown);
+            this.screenImageBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.screenImageBox_MouseMove);
+            this.screenImageBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.screenImageBox_MouseUp);
             // 
             // menuStrip1
             // 
@@ -115,6 +116,7 @@
             this.mouseControlCheckbox.TabIndex = 2;
             this.mouseControlCheckbox.Text = "Enable mouse";
             this.mouseControlCheckbox.UseVisualStyleBackColor = true;
+            this.mouseControlCheckbox.CheckedChanged += new System.EventHandler(this.mouseControlCheckbox_CheckedChanged);
             // 
             // keyboardControlCheckbox
             // 
@@ -125,6 +127,7 @@
             this.keyboardControlCheckbox.TabIndex = 3;
             this.keyboardControlCheckbox.Text = "Enable keyboard";
             this.keyboardControlCheckbox.UseVisualStyleBackColor = true;
+            this.keyboardControlCheckbox.CheckedChanged += new System.EventHandler(this.keyboardControlCheckbox_CheckedChanged);
             // 
             // refreshInterval
             // 
@@ -278,7 +281,7 @@
             this.Load += new System.EventHandler(this.RemoteDesktop_Load);
             this.Shown += new System.EventHandler(this.RemoteDesktop_Shown);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.RemoteDesktop_KeyDown);
-            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.RemoteDesktop_KeyPress);
+            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.RemoteDesktop_KeyUp);
             ((System.ComponentModel.ISupportInitialize)(this.screenImageBox)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();

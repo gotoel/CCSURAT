@@ -260,7 +260,6 @@ namespace CCSURAT_Server
 
                 // Extract monitor device name and the |*| splitter string from the data. 
                 string deviceName = temp.Split("|*|".ToCharArray(), StringSplitOptions.None)[0].Substring(start);
-                Log("DEVICENAME: " + deviceName);
                 start += deviceName.Length + 3; // + 3 for the |*| split string
 
                 start += temp.IndexOf("[[BINARY]]");

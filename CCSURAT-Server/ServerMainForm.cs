@@ -37,7 +37,7 @@ namespace CCSURAT_Server
             ListenOnPort(listenPort);
 
             // start ping timer that pings clients every x seconds.
-            pingTimer.Start();
+            //pingTimer.Start();
             this.Text = "CCSURAT-Server v" + Application.ProductVersion;
 
             // start performance monitor timer
@@ -269,8 +269,21 @@ namespace CCSURAT_Server
                     {
                         RemoteDesktop remoteDesktop = new RemoteDesktop(zItem.zombieClient);
                         remoteDesktop.Show();
+                        //this.BeginInvoke((Action)delegate {
+
+                        //    RemoteDesktop remoteDesktop = new RemoteDesktop(zItem.zombieClient);
+                        //    remoteDesktop.Show();
+
+                        //});
                     }
                 }
+        }
+
+        private void openRDP(Zombie z)
+        {
+            RemoteDesktop remoteDesktop = new RemoteDesktop(z);
+            remoteDesktop.Show();
+
         }
 
         private void windowManagerToolStripMenuItem_Click(object sender, EventArgs e)

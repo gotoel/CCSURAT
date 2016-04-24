@@ -14,14 +14,17 @@ namespace CCSURAT_Client.Control
         private Bitmap image;
         private byte[] imageBytes;
 
+        private static object screenImageLock = new object();
 
         // Native methods
         [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
         public static extern void mouse_event(long dwFlags, long dx, long dy, long cButtons, long dwExtraInfo);
+        private const int MOUSEEVENTF_MOVE = 0x01;
         private const int MOUSEEVENTF_LEFTDOWN = 0x02;
         private const int MOUSEEVENTF_LEFTUP = 0x04;
         private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
         private const int MOUSEEVENTF_RIGHTUP = 0x10;
+        private const int MOUSEEVENTF_ABSOLUTE = 0x8000;
 
         [DllImport("user32.dll")]
         public static extern bool keybd_event(byte bVk, byte bScan, uint dwFlags, int dwExtraInfo);
@@ -36,7 +39,7 @@ namespace CCSURAT_Client.Control
         static extern IntPtr GetForegroundWindow();
 
         // Handle mouse click even at X/Y
-        public void MouseClick(long x, long y, string button)
+        public void MouseClick(long x, long y, string button, string clickAction)
         {
             Cursor.Position = new Point((int)x, (int)y);
 
@@ -44,20 +47,35 @@ namespace CCSURAT_Client.Control
             switch (button)
             {
                 case "Left":
-                    mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, Cursor.Position.X, Cursor.Position.Y, 0, 0);
+                    if(clickAction.Equals("Down"))
+                        mouse_event(MOUSEEVENTF_LEFTDOWN, Cursor.Position.X, Cursor.Position.Y, 0, 0);
+                    else
+                        mouse_event(MOUSEEVENTF_LEFTUP, Cursor.Position.X, Cursor.Position.Y, 0, 0);
                     break;
                 case "Right":
-                    mouse_event(MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_RIGHTUP, Cursor.Position.X, Cursor.Position.Y, 0, 0);
+                    if(clickAction.Equals("Down"))
+                        mouse_event(MOUSEEVENTF_RIGHTDOWN, Cursor.Position.X, Cursor.Position.Y, 0, 0);
+                    else
+                        mouse_event(MOUSEEVENTF_RIGHTUP, Cursor.Position.X, Cursor.Position.Y, 0, 0);
                     break;
             }
         }
 
+        // Handle mouse move even at X/Y
+        public void MouseMove(long x, long y)
+        {
+            Cursor.Position = new Point((int)x, (int)y);
+            //mouse_event(MOUSEEVENTF_MOVE, x, y, 0, 0);
+        }
+
         // Handle key press events using the key's keycode
         // May need to add a KeyRelease function on server+client
-        public void KeyPress(string key)
+        public void KeyPress(string key, string pressAction)
         {
-            keybd_event(Convert.ToByte(key), 0, KEYEVENTF_KEYDOWN, 0);
-            keybd_event(Convert.ToByte(key), 0, KEYEVENTF_KEYUP, 0);
+            if (pressAction.Equals("Down"))
+                keybd_event(Convert.ToByte(key), 0, KEYEVENTF_KEYDOWN, 0);
+            else
+                keybd_event(Convert.ToByte(key), 0, KEYEVENTF_KEYUP, 0);
         }
 
         public byte[] GetScreenshot(string quality, string size, string deviceName)
@@ -99,18 +117,22 @@ namespace CCSURAT_Client.Control
                         {
                             try
                             {
-                                g.CopyFromScreen(screen.Bounds.X, screen.Bounds.Y, 0, 0, screen.Bounds.Size, CopyPixelOperation.SourceCopy);
-                                System.Drawing.Imaging.Encoder myEncoder = System.Drawing.Imaging.Encoder.Quality;
-                                EncoderParameters encs = new EncoderParameters(1);
-                                EncoderParameter enc = new EncoderParameter(myEncoder, quality);
-                                encs.Param[0] = enc;
-                                image = Resize(image, size);
-                                MemoryStream temp = new MemoryStream();
-                                image.Save(temp, jpeg, encs);
-                                image = new Bitmap(temp);
-                                imageBytes = temp.GetBuffer();
-                                temp.Close();
-                            } catch(Exception ex)
+                                lock (screenImageLock)
+                                {
+                                    g.CopyFromScreen(screen.Bounds.X, screen.Bounds.Y, 0, 0, screen.Bounds.Size, CopyPixelOperation.SourceCopy);
+                                    System.Drawing.Imaging.Encoder myEncoder = System.Drawing.Imaging.Encoder.Quality;
+                                    EncoderParameters encs = new EncoderParameters(1);
+                                    EncoderParameter enc = new EncoderParameter(myEncoder, quality);
+                                    encs.Param[0] = enc;
+                                    image = Resize(image, size);
+                                    MemoryStream temp = new MemoryStream();
+                                    image.Save(temp, jpeg, encs);
+                                    image = new Bitmap(temp);
+                                    imageBytes = temp.GetBuffer();
+                                    temp.Close();
+                                }
+                            }
+                            catch (Exception ex)
                             {
                                 Console.WriteLine("ERROR MAKING SCREENSHOT: " + ex.ToString());
                             }

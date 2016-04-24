@@ -44,7 +44,7 @@ public class NetworkManager {
     
     public void Start()
     {
-        Log("Connecting to server: " + "*******" + ":" + serverPort);
+        Log("Connecting to server: " + serverIP + ":" + serverPort);
         while(true)
         {
             while(!isConnected)
@@ -60,7 +60,7 @@ public class NetworkManager {
                     ListenToCommands();
                 } catch(Exception ex)
                 {
-                    System.out.println("NetworkManager start error: " + ex.toString());
+                    System.out.println("NetworkManager start error to " + serverIP + " : " + ex.toString());
                 }
             }  
         }
