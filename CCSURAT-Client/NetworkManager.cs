@@ -6,6 +6,10 @@ using System.Threading;
 using System.Timers;
 using System.Windows.Forms;
 using System.Collections.Generic;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
+using System.IO;
+using System.Security.Authentication;
 
 namespace CCSURAT_Client
 {
@@ -24,6 +28,11 @@ namespace CCSURAT_Client
         private NetworkStream netStream;
         private string curData;
         private Queue<string> commandQueue;
+
+        // Security
+        private SslStream sslStream;
+        private StreamWriter sw;
+        private StreamReader sr;
 
         private string status;
         private Boolean isConnected;
@@ -80,6 +89,12 @@ namespace CCSURAT_Client
                         client.Connect(serverIP, serverPort);
                         netStream = client.GetStream();
 
+                        sslStream = new SslStream(netStream, false, new RemoteCertificateValidationCallback(TrustAllCertificatesCallback));
+
+
+                        X509Certificate2Collection xc = new X509Certificate2Collection();
+                        sslStream.AuthenticateAsClient(serverIP, xc, SslProtocols.Tls, false);
+
                         isConnected = true;
                         status = "Connected.";
                         Log("Connection successful!");
@@ -92,18 +107,23 @@ namespace CCSURAT_Client
                         Thread.Sleep(100);
                         Log("Retrying connection...");
                     }
-                    System.Threading.Thread.Sleep(1);
+                    Thread.Sleep(1);
                     Application.DoEvents();
                 }
-                System.Threading.Thread.Sleep(1);
+                Thread.Sleep(1);
                 Application.DoEvents();
             }
+        }
+
+        public bool TrustAllCertificatesCallback(object sender, X509Certificate cert, X509Chain chain, SslPolicyErrors errors)
+        {
+            return true;
         }
 
         private void ListenToCommands()
         {
             Log("Listening to commands.");
-            netStream = client.GetStream();
+            //netStream = client.GetStream();
             try
             {
                 while (netStream.CanRead && IsAlive() && IsSocketConnected(client.Client))
@@ -174,6 +194,7 @@ namespace CCSURAT_Client
             {
                 // write empty buffer to server to check if connection is alive
                 byte[] empty = new byte[1];
+                //netStream.Write(empty, 0, 0);
                 netStream.Write(empty, 0, 0);
                 return true;
             }
@@ -266,7 +287,8 @@ namespace CCSURAT_Client
                         remoteDesktop.MouseMove(Convert.ToInt64(prms[0]), Convert.ToInt64(prms[1]));
                         break;
                     case "KEYPRESS":
-                        remoteDesktop.KeyPress(prms[0], prms[1]);
+                        remoteDesktop.KeyPress(prms[0], prms[1
+                            ]);
                         break;
                 }
             } catch(Exception ex)
@@ -304,10 +326,15 @@ namespace CCSURAT_Client
         // Checks if first command in data is closed.
         private bool FirstCommandIsClosed(string data)
         {
-            string openCommandTag = data.Substring(0, data.IndexOf("]") + 2);
-            openCommandTag = data.Substring(2, openCommandTag.Length - 4);
-            string closeCommandTag = "[[/" + openCommandTag + "]]";
-            return data.Contains(closeCommandTag);
+            try {
+                string openCommandTag = data.Substring(0, data.IndexOf("]") + 2);
+                openCommandTag = data.Substring(2, openCommandTag.Length - 4);
+                string closeCommandTag = "[[/" + openCommandTag + "]]";
+                return data.Contains(closeCommandTag);
+            } catch(Exception ex)
+            {
+                return false;
+            }
         }
 
         // Gets the first command in data.
@@ -329,6 +356,7 @@ namespace CCSURAT_Client
                 try
                 {
                     byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
+                    //netStream.Write(msg, 0, msg.Length);
                     netStream.Write(msg, 0, msg.Length);
                     Thread.Sleep(20);
                     if (!data.Contains("[[SCREENSHOT]]"));
@@ -348,6 +376,7 @@ namespace CCSURAT_Client
             {
                 try
                 {
+                    //netStream.Write(data, 0, data.Length);
                     netStream.Write(data, 0, data.Length);
                 }
                 catch (Exception ex)

