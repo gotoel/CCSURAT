@@ -6,6 +6,10 @@ using System.Threading;
 using System.Timers;
 using System.Windows.Forms;
 using System.Collections.Generic;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
+using System.IO;
+using System.Security.Authentication;
 
 namespace CCSURAT_Client
 {
@@ -24,6 +28,12 @@ namespace CCSURAT_Client
         private NetworkStream netStream;
         private string curData;
         private Queue<string> commandQueue;
+
+        // Security
+        private bool sslSecured = false;
+        private SslStream sslStream;
+        private StreamWriter sw;
+        private StreamReader sr;
 
         private string status;
         private Boolean isConnected;
@@ -79,6 +89,15 @@ namespace CCSURAT_Client
                         client = new TcpClient();
                         client.Connect(serverIP, serverPort);
                         netStream = client.GetStream();
+                        if (sslSecured)
+                        {
+                            // Create an SSL stream that wraps netstream
+                            sslStream = new SslStream(netStream, false, new RemoteCertificateValidationCallback(TrustAllCertificatesCallback));
+                            X509Certificate2Collection xc = new X509Certificate2Collection();
+
+                            // Authenticate with server using TLS without a certificate
+                            sslStream.AuthenticateAsClient(serverIP, xc, SslProtocols.Tls, false);
+                        }
 
                         isConnected = true;
                         status = "Connected.";
@@ -92,26 +111,32 @@ namespace CCSURAT_Client
                         Thread.Sleep(100);
                         Log("Retrying connection...");
                     }
-                    System.Threading.Thread.Sleep(1);
+                    Thread.Sleep(1);
                     Application.DoEvents();
                 }
-                System.Threading.Thread.Sleep(1);
+                Thread.Sleep(1);
                 Application.DoEvents();
             }
+        }
+
+        public bool TrustAllCertificatesCallback(object sender, X509Certificate cert, X509Chain chain, SslPolicyErrors errors)
+        {
+            return true;
         }
 
         private void ListenToCommands()
         {
             Log("Listening to commands.");
-            netStream = client.GetStream();
+            //netStream = client.GetStream();
             try
             {
-                while (netStream.CanRead && IsAlive() && IsSocketConnected(client.Client))
+                while ((sslSecured ? sslStream.CanRead : netStream.CanRead) && IsAlive() && IsSocketConnected(client.Client))
                 {
                     byte[] bytes = new byte[1024];
                     string data = null;
                     int i;
-                    if ((i = netStream.Read(bytes, 0, bytes.Length)) != 0)
+                    if ((i = sslSecured ? sslStream.Read(bytes, 0, bytes.Length) :
+                                          netStream.Read(bytes, 0, bytes.Length)) != 0)
                     {
                         // convert data bytes to string
                         data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
@@ -174,7 +199,10 @@ namespace CCSURAT_Client
             {
                 // write empty buffer to server to check if connection is alive
                 byte[] empty = new byte[1];
-                netStream.Write(empty, 0, 0);
+                if (sslSecured)
+                    sslStream.Write(empty, 0, 0);
+                else
+                    netStream.Write(empty, 0, 0);
                 return true;
             }
             catch (SocketException ex)
@@ -266,7 +294,8 @@ namespace CCSURAT_Client
                         remoteDesktop.MouseMove(Convert.ToInt64(prms[0]), Convert.ToInt64(prms[1]));
                         break;
                     case "KEYPRESS":
-                        remoteDesktop.KeyPress(prms[0], prms[1]);
+                        remoteDesktop.KeyPress(prms[0], prms[1
+                            ]);
                         break;
                 }
             } catch(Exception ex)
@@ -329,7 +358,10 @@ namespace CCSURAT_Client
                 try
                 {
                     byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
-                    netStream.Write(msg, 0, msg.Length);
+                    if (sslSecured)
+                        sslStream.Write(msg, 0, msg.Length);
+                    else
+                        netStream.Write(msg, 0, msg.Length);
                     Thread.Sleep(20);
                     if (!data.Contains("[[SCREENSHOT]]"));
                         Log("Data sent: " + data);
@@ -348,7 +380,11 @@ namespace CCSURAT_Client
             {
                 try
                 {
-                    netStream.Write(data, 0, data.Length);
+                    //netStream.Write(data, 0, data.Length);
+                    if(sslSecured)
+                        sslStream.Write(data, 0, data.Length);
+                    else
+                        netStream.Write(data, 0, data.Length);
                 }
                 catch (Exception ex)
                 {
