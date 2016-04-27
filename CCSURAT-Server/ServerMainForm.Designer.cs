@@ -440,6 +440,7 @@
             // 
             // pingTimer
             // 
+            this.pingTimer.Enabled = true;
             this.pingTimer.Interval = 2000;
             this.pingTimer.Tick += new System.EventHandler(this.pingTimer_Tick);
             // 

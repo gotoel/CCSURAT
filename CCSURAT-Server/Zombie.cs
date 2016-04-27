@@ -30,6 +30,7 @@ namespace CCSURAT_Server
         private NetworkStream netStream;
 
         // Security
+        private bool sslSecured = false;
         private SslStream sslStream;
         private X509Certificate serverCertificate;
         private StreamWriter sw;
@@ -67,15 +68,20 @@ namespace CCSURAT_Server
             this.netStream = client.GetStream();
             sslStream = new SslStream(netStream);
 
-            var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CCSURAT_Server.Resources.Server.pfx");
-            var bytes = new byte[stream.Length];
-            stream.Read(bytes, 0, bytes.Length);
-            serverCertificate = new X509Certificate2(bytes, "cs492");
+            if (sslSecured)
+            {
+                // Build the server cert from resources
+                Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("CCSURAT_Server.Resources.Server.pfx");
+                byte[] bytes = new byte[stream.Length];
+                stream.Read(bytes, 0, bytes.Length);
+                serverCertificate = new X509Certificate2(bytes, "cs492");
 
-            sslStream.AuthenticateAsServer(serverCertificate, false, SslProtocols.Tls, false);
+                sslStream.AuthenticateAsServer(serverCertificate, false, SslProtocols.Tls, false);
 
-            sw = new StreamWriter(sslStream);
-            sr = new StreamReader(sslStream);
+                // Create stream writer/reader objects, could be used for easier read/write
+                sw = new StreamWriter(sslStream);
+                sr = new StreamReader(sslStream);
+            }
 
             this.active = true;
 
@@ -97,13 +103,14 @@ namespace CCSURAT_Server
             {
                 while (IsAlive() && IsActive())
                 {
-                    if (sslStream.CanRead)
+                    if (sslSecured ? sslStream.CanRead : netStream.CanRead)
                     {
                         try {
                             byte[] bytes = new byte[1024];
                             string data = null;
                             int i;
-                            if ((i = sslStream.Read(bytes, 0, bytes.Length)) != 0)
+                            if ((i = sslSecured ? sslStream.Read(bytes, 0, bytes.Length) :
+                                                  netStream.Read(bytes, 0, bytes.Length)) != 0)
                             {
                                 // convert recieved bytes to string data
                                 data = Encoding.ASCII.GetString(bytes, 0, i);
@@ -167,8 +174,10 @@ namespace CCSURAT_Server
             {
                 // write empty buffer to client to check if connection is alive
                 byte[] empty = new byte[10];
-                //sslStream.Write(empty, 0, 0);
-                sslStream.Write(empty, 0, 0);
+                if (sslSecured)
+                    sslStream.Write(empty, 0, 0);
+                else
+                    netStream.Write(empty, 0, 0);
                 //GetPing();
                 //UpdatePing();
                 return true;
@@ -204,7 +213,7 @@ namespace CCSURAT_Server
                 }
                 catch (Exception ex)
                 {
-                    Log("PING ERROR: " + ex.StackTrace);
+                    //Log("PING ERROR: " + ex.StackTrace);
                 }
             }
         }
@@ -322,15 +331,10 @@ namespace CCSURAT_Server
         // Checks if first command in data is closed.
         private bool FirstCommandIsClosed(string data)
         {
-            try {
-                string openCommandTag = data.Substring(0, data.IndexOf("]") + 2);
-                openCommandTag = data.Substring(2, openCommandTag.Length - 4);
-                string closeCommandTag = "[[/" + openCommandTag + "]]";
-                return data.Contains(closeCommandTag);
-            } catch(Exception ex)
-            {
-                return false;
-            }
+            string openCommandTag = data.Substring(0, data.IndexOf("]") + 2);
+            openCommandTag = data.Substring(2, openCommandTag.Length - 4);
+            string closeCommandTag = "[[/" + openCommandTag + "]]";
+            return data.Contains(closeCommandTag);
         }
 
         // Gets the first command's data.
@@ -350,8 +354,10 @@ namespace CCSURAT_Server
             try {
                 // convert string data to byte array and write it to the stream
                 byte[] data = Encoding.ASCII.GetBytes(s);
-                //sslStream.Write(data, 0, data.Length);
-                sslStream.Write(data, 0, data.Length);
+                if(sslSecured)
+                    sslStream.Write(data, 0, data.Length);
+                else
+                    netStream.Write(data, 0, data.Length);
                 if (!s.Contains("[[BINARY]]") && !s.Contains("[[SCREENSHOT]]"))
                     Log("Data sent: " + s);
             } catch(Exception ex)

@@ -13,3 +13,4 @@ C:\Users\gotoel\Desktop\School\CS492 - Computer Security\CCSURAT\CCSURAT-Server\
 C:\Users\gotoel\Desktop\School\CS492 - Computer Security\CCSURAT\CCSURAT-Server\obj\Release\CCSURAT-Server.exe
 C:\Users\gotoel\Desktop\School\CS492 - Computer Security\CCSURAT\CCSURAT-Server\obj\Release\CCSURAT-Server.pdb
 C:\Users\gotoel\Desktop\School\CS492 - Computer Security\CCSURAT\CCSURAT-Server\bin\Release\CCSURAT-Server.pdb
+C:\Users\gotoel\Desktop\School\CS492 - Computer Security\CCSURAT\CCSURAT-Server\obj\Release\CCSURAT-Server.csprojResolveAssemblyReference.cache
