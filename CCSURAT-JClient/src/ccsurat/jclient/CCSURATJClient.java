@@ -18,7 +18,7 @@ public class CCSURATJClient {
             clientForm.Log("Client started.");
         }
         else {
-            NetworkManager connection = new NetworkManager("32.212.129.249", 7777);
+            NetworkManager connection = new NetworkManager("127.0.0.1", 7777);
             new Thread(() -> connection.Start()).start();
         }
     }

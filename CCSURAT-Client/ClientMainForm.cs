@@ -7,7 +7,7 @@ namespace CCSURAT_Client
     public partial class ClientMainForm : Form
     { 
         // Declare server details.
-        private static string serverIP = "32.212.129.249";
+        private static string serverIP = "127.0.0.1";
         private static int serverPort = 7777;
         private static bool install = true;
 
