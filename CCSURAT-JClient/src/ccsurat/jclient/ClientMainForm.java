@@ -17,7 +17,7 @@ public class ClientMainForm extends javax.swing.JFrame {
     public ClientMainForm() {
         initComponents();
         
-        connection = new NetworkManager(this, "32.212.129.249", 7777);
+        connection = new NetworkManager(this, "127.0.0.1", 7777);
         new Thread(() -> connection.Start()).start();
     }
 
